@@ -1,0 +1,14 @@
+.DS_Store
+.idea
+.svn
+META-INF/
+!/src/main/webapp/META-INF
+log/
+logs/
+*.iml
+target/
+*~
+*.swap
+src/main/webapp/uploads
+src/main/webapp/WEB-INF/lib
+src/main/webapp/WEB-INF/classes
