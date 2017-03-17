@@ -1,21 +1,22 @@
 package com.le.bigdata.auth.authentication.exception;
 
-import javax.servlet.ServletException;
+import com.le.bigdata.core.exception.BusinessServiceException;
+
 
 /**
  * Created by benjamin on 9/12/14.
  */
-public class NoGrantTypeFoundException extends ServletException {
+public class NoGrantTypeFoundException extends BusinessServiceException {
 
-    public NoGrantTypeFoundException() {
-        super();
+    public NoGrantTypeFoundException(int code) {
+        super(code);
     }
 
-    public NoGrantTypeFoundException(String message) {
-        super(message);
+    public NoGrantTypeFoundException(int code, String message) {
+        super(code, message);
     }
 
-    public NoGrantTypeFoundException(String message, Throwable throwable) {
-        super(message, throwable);
+    public NoGrantTypeFoundException(int code, String message, Throwable throwable) {
+        super(code, message, throwable);
     }
 }

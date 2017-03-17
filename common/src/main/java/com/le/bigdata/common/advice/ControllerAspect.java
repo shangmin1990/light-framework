@@ -3,6 +3,7 @@ package com.le.bigdata.common.advice;
 import com.alibaba.fastjson.JSON;
 import com.le.bigdata.core.Constant;
 import com.le.bigdata.core.dto.CommonResponseDTO;
+import com.le.bigdata.core.exception.BusinessServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.WebDataBinder;
@@ -45,8 +46,13 @@ public class ControllerAspect implements Constant {
             response.setCharacterEncoding(Constant.CHARSET_UTF8);
             response.setContentType("application/json;charset=utf-8");
             CommonResponseDTO commonResponseDTO = new CommonResponseDTO();
-            commonResponseDTO.setSuccess(false);
-            commonResponseDTO.setCode(500);
+//            commonResponseDTO.setSuccess(false);
+            if(e instanceof BusinessServiceException){
+                BusinessServiceException ex = (BusinessServiceException) e;
+                commonResponseDTO.setCode(ex.getCode());
+            } else {
+                commonResponseDTO.setCode(500);
+            }
             commonResponseDTO.setErrorMsg(e.toString());
             printWriter.write(JSON.toJSONString(commonResponseDTO));
         } catch (IOException e1) {

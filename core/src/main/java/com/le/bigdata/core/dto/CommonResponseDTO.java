@@ -1,5 +1,7 @@
 package com.le.bigdata.core.dto;
 
+import com.alibaba.fastjson.JSON;
+
 import java.io.Serializable;
 
 /**
@@ -7,7 +9,7 @@ import java.io.Serializable;
  */
 public class CommonResponseDTO implements Serializable {
 
-    private boolean success;
+//    private boolean success;
     private int code;
     private Object data;
     private String errorMsg;
@@ -16,31 +18,23 @@ public class CommonResponseDTO implements Serializable {
 
     }
 
-    public CommonResponseDTO(boolean success, int code, Object data, String errorMsg) {
-        this.success = success;
+    public CommonResponseDTO(int code, Object data, String errorMsg) {
+//        this.success = success;
         this.data = data;
         this.errorMsg = errorMsg;
         this.code = code;
     }
 
-    public CommonResponseDTO(boolean success) {
-        this(success, 200, null, null);
+    public CommonResponseDTO(int code) {
+        this(code, null, null);
     }
 
-    public CommonResponseDTO(boolean success, Object data) {
-        this(success, 200, data, null);
+    public CommonResponseDTO(int code, Object data) {
+        this(code, data, null);
     }
 
-    public CommonResponseDTO(boolean success, int code, String errorMsg) {
-        this(success, code, null, errorMsg);
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
+    public CommonResponseDTO(int code, String errorMsg) {
+        this(code, null, errorMsg);
     }
 
     public Object getData() {
@@ -65,5 +59,10 @@ public class CommonResponseDTO implements Serializable {
 
     public void setCode(int code) {
         this.code = code;
+    }
+
+    @Override
+    public String toString() {
+        return JSON.toJSONString(this);
     }
 }

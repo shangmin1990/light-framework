@@ -4,6 +4,7 @@ import com.le.bigdata.auth.client.IClientManager;
 import com.le.bigdata.auth.client.impl.ClientManager;
 import com.le.bigdata.auth.token.Token;
 import com.le.bigdata.auth.util.WebUtil;
+import com.le.bigdata.core.dto.CommonResponseDTO;
 import com.le.bigdata.core.util.PropertiesUtil;
 import org.springframework.stereotype.Component;
 
@@ -56,10 +57,10 @@ public class AuthorizationCodeHandler extends GrantTypeAuthorizationHandlerAdapt
             }
             // 如果cookie是空 而且用户名非空,那就是正在登录验证
             if (WebUtil.getCookieValue(request, DEFAULT_USER_COOKIE_NAME) == null && username != null) {
-                boolean result = login(request);
-                if (!result) {
+                CommonResponseDTO result = login(request);
+                if (result.getCode() != 200) {
                     try {
-                        WebUtil.replyNoAccess(request, response, "UserName or password is wrong");
+                        WebUtil.replyNoAccess(request, response, result.toString());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -107,7 +108,7 @@ public class AuthorizationCodeHandler extends GrantTypeAuthorizationHandlerAdapt
                 String code = request.getParameter("code");
                 if (code == null || code.isEmpty()) {
                     try {
-                        WebUtil.replyNoAccess(request, response, "No Request code found");
+                        WebUtil.replyNoAccess(request, response, new CommonResponseDTO(10009, "No Request code found").toString());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

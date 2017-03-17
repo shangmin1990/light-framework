@@ -1,6 +1,8 @@
 package com.le.bigdata.auth.authentication;
 
 
+import com.le.bigdata.core.dto.CommonResponseDTO;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -13,5 +15,5 @@ public interface PasswordValidator {
      * @param request
      * @return
      */
-    boolean login(HttpServletRequest request) throws Exception;
+    CommonResponseDTO login(HttpServletRequest request) throws Exception;
 }

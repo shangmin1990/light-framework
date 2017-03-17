@@ -2,6 +2,7 @@ package com.le.bigdata.auth.authentication.impl;
 
 import com.le.bigdata.auth.token.Token;
 import com.le.bigdata.auth.util.WebUtil;
+import com.le.bigdata.core.dto.CommonResponseDTO;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +18,8 @@ public class PasswordAuthorizationHandler extends GrantTypeAuthorizationHandlerA
     @Override
     public void handlePasswordGrantType(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        boolean result = login(request);
+        CommonResponseDTO commonResponseDTO = login(request);
+        boolean result = commonResponseDTO.getCode() == 200;
         String username = request.getParameter(USERNAME);
         // 登录成功
         if (result) {
@@ -31,7 +33,7 @@ public class PasswordAuthorizationHandler extends GrantTypeAuthorizationHandlerA
             WebUtil.responseToken(request, response, token);
         } else {
             try {
-                WebUtil.replyNoAccess(request, response, "username or password is wrong");
+                WebUtil.replyNoAccess(request, response, commonResponseDTO.toString());
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -7,6 +7,7 @@ import com.le.bigdata.auth.token.GrantType;
 import com.le.bigdata.auth.token.IAuthTokenGenerator;
 import com.le.bigdata.auth.token.IAuthTokenProvider;
 import com.le.bigdata.core.Constant;
+import com.le.bigdata.core.dto.CommonResponseDTO;
 import com.le.bigdata.core.util.SpringContextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,7 +86,7 @@ public abstract class AbstractAuthorizationHandler implements AuthorizationHandl
      * 通过查找注册在spring ioc context中的bean name获取PasswordValidator实例
      */
     private void initPasswordValidatorByBeanName() {
-        if (beanName != null && !beanName.isEmpty()) {
+        if (beanName != null && !beanName.isEmpty() && !"${password-validator.beanName}".equals(beanName)) {
             ApplicationContext context = SpringContextUtils.getApplicationContext();
             PasswordValidator passwordValidator = context.getBean(beanName, PasswordValidator.class);
             if (passwordValidator != null) {
@@ -99,7 +100,7 @@ public abstract class AbstractAuthorizationHandler implements AuthorizationHandl
      */
     @Deprecated
     private void initPasswordValidatorByClassName() {
-        if (className != null && !className.isEmpty()) {
+        if (className != null && !className.isEmpty() && !"${password-validator.class}".equals(className)) {
             try {
                 Class clazz = Class.forName(className);
                 Class<?>[] interfaces = clazz.getInterfaces();
@@ -134,12 +135,12 @@ public abstract class AbstractAuthorizationHandler implements AuthorizationHandl
 //      handleClientGrantType(httpServletRequest, httpServletResponse);
 //    }
         else {
-            throw new NoGrantTypeFoundException("Grant_type " + grant_type + " not support");
+            throw new NoGrantTypeFoundException(10001, "Grant_type " + grant_type + " not support");
         }
 
     }
 
-    boolean login(HttpServletRequest request) throws Exception {
+    CommonResponseDTO login(HttpServletRequest request) throws Exception {
         return passwordValidator.login(request);
     }
 

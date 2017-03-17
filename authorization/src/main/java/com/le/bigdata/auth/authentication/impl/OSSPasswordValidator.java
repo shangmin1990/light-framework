@@ -3,6 +3,7 @@ package com.le.bigdata.auth.authentication.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.le.bigdata.auth.authentication.PasswordValidator;
+import com.le.bigdata.core.dto.CommonResponseDTO;
 import com.le.bigdata.core.util.CodecUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -39,7 +40,7 @@ public class OSSPasswordValidator implements PasswordValidator {
     private static final String USER_INFO_URL = "http://sso.leshiren.cn:20008/user.php";
 
     @Override
-    public boolean login(HttpServletRequest request) throws Exception {
+    public CommonResponseDTO login(HttpServletRequest request) throws Exception {
         String username = null;
         String password = null;
         try {
@@ -53,13 +54,13 @@ public class OSSPasswordValidator implements PasswordValidator {
             }
             JSONObject jsonResult = ossLogin(username, password);
             Boolean responseStatus = jsonResult.getJSONObject("respond").getBoolean("status");
-            return responseStatus;
+            return new CommonResponseDTO(responseStatus ? 200 : 10000);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
+        return new CommonResponseDTO(10000);
 
     }
 

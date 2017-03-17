@@ -1,8 +1,8 @@
 package com.le.bigdata.auth.authentication.controller;
 
 import com.le.bigdata.auth.authentication.AuthorizationHandler;
-import com.le.bigdata.auth.dto.CommonResponseDTO;
 import com.le.bigdata.auth.token.IAuthTokenProvider;
+import com.le.bigdata.core.dto.CommonResponseDTO;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +44,14 @@ public class AuthorizationCtrl {
         authorizationHandlers.add(authorizationCode);
     }
 
+    public IAuthTokenProvider getTokenProvider() {
+        return tokenProvider;
+    }
+
+    public void setTokenProvider(IAuthTokenProvider tokenProvider) {
+        this.tokenProvider = tokenProvider;
+    }
+
     @RequestMapping(method = RequestMethod.POST, value = "authorize")
     public void authorize(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
@@ -62,8 +70,8 @@ public class AuthorizationCtrl {
 
     @RequestMapping(method = RequestMethod.GET, value = "revoke_token")
     @ResponseBody
-    public CommonResponseDTO authorize(@CookieValue(ACCESS_TOKEN) String token) throws IOException {
+    public CommonResponseDTO revokeToken(@CookieValue(ACCESS_TOKEN) String token) throws IOException {
         tokenProvider.deleteToken(token);
-        return new CommonResponseDTO(true);
+        return new CommonResponseDTO(200);
     }
 }

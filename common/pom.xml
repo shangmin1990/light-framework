@@ -7,7 +7,7 @@
     <parent>
         <artifactId>light-framework</artifactId>
         <groupId>com.le.bigdata</groupId>
-        <version>1.1.2-SNAPSHOT</version>
+        <version>1.2.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -88,6 +88,7 @@
             <artifactId>mapper</artifactId>
             <version>${mapper.version}</version>
         </dependency>
+
     </dependencies>
 
     <build>
