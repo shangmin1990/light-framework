@@ -3,6 +3,10 @@ package com.le.bigdata.auth.authentication.controller;
 import com.le.bigdata.auth.authentication.AuthorizationHandler;
 import com.le.bigdata.auth.token.IAuthTokenProvider;
 import com.le.bigdata.core.dto.CommonResponseDTO;
+import com.mangofactory.swagger.annotations.ApiIgnore;
+import com.wordnik.swagger.annotations.ApiImplicitParam;
+import com.wordnik.swagger.annotations.ApiImplicitParams;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,6 +57,13 @@ public class AuthorizationCtrl {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "authorize")
+    @ApiOperation(value = "登录接口(OAuth2.0认证 实现了 grant_type=password 和 grant_type=code的认证方式)",
+    notes = "username是必传参数, 理论上来讲可以灵活的传递其他参数, 但默认的只需要传递 username, password, grant_type即可")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "username", dataType = "string",value = "用户名", paramType = "form"),
+            @ApiImplicitParam(name = "password", dataType = "string", value = "密码", paramType = "form"),
+            @ApiImplicitParam(name = "grant_type", dataType = "string", value = "用户名", defaultValue = "password", allowableValues = "password", paramType = "form")
+    })
     public void authorize(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             for (AuthorizationHandler authorizationHandler : authorizationHandlers) {
@@ -69,8 +80,9 @@ public class AuthorizationCtrl {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "revoke_token")
+    @ApiOperation("登出接口")
     @ResponseBody
-    public CommonResponseDTO revokeToken(@CookieValue(ACCESS_TOKEN) String token) throws IOException {
+    public CommonResponseDTO revokeToken(@ApiIgnore @CookieValue(ACCESS_TOKEN) String token) throws IOException {
         tokenProvider.deleteToken(token);
         return new CommonResponseDTO(200);
     }

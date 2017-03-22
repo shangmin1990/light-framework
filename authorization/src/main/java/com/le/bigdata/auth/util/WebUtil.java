@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.le.bigdata.auth.authentication.TokenResponseDTO;
 import com.le.bigdata.auth.token.Token;
 import com.le.bigdata.core.Constant;
+import com.le.bigdata.core.dto.CommonResponseDTO;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -88,5 +89,30 @@ public class WebUtil implements Constant {
     public static boolean isAjaxRequest(HttpServletRequest request) {
         String requestType = request.getHeader(AJAX_HEADER);
         return requestType != null && requestType.toLowerCase().equals(XMLHTTPREQUEST);
+    }
+
+    public static void response(HttpServletRequest request, HttpServletResponse httpServletResponse, Token token) {
+//        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+        //String encoding = httpServletRequest.getCharacterEncoding();
+        httpServletResponse.setContentType("application/json;charset=UTF-8");
+        httpServletResponse.setHeader("Cache-Control", "no-store");
+        httpServletResponse.setHeader("Pragma", "no-cache");
+        httpServletResponse.setCharacterEncoding(CHARSET_UTF8);
+        PrintWriter out = null;
+        try {
+            out = httpServletResponse.getWriter();
+            TokenResponseDTO tokenResponseDTO = new TokenResponseDTO();
+            tokenResponseDTO.setAccess_token(token.getValue());
+            tokenResponseDTO.setExpires_in(token.getExpires());
+            CommonResponseDTO common = new CommonResponseDTO(200, tokenResponseDTO);
+            out.println(common.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (out != null) {
+                out.flush();
+                out.close();
+            }
+        }
     }
 }

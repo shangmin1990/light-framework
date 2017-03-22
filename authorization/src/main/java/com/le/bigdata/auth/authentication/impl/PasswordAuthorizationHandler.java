@@ -30,7 +30,7 @@ public class PasswordAuthorizationHandler extends GrantTypeAuthorizationHandlerA
                 token.setValue(tokenValue);
             }
             getTokenProvider().saveToken(username, token);
-            WebUtil.responseToken(request, response, token);
+            WebUtil.response(request, response, token);
         } else {
             try {
                 WebUtil.replyNoAccess(request, response, commonResponseDTO.toString());
