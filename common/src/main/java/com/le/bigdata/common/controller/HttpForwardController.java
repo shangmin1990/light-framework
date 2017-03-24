@@ -27,30 +27,23 @@ import java.util.*;
 public class HttpForwardController implements Constant {
 
     @RequestMapping(value = "get", method = RequestMethod.GET)
-    public CommonResponseDTO forward(@RequestParam String target) {
+    public CommonResponseDTO forward(@RequestParam String target) throws IOException {
         CloseableHttpClient closeableHttpClient;
         CloseableHttpResponse response;
         closeableHttpClient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(target);
-//        httpGet.setHeader(new BasicHeader("Cookie", "letv_user_name=shangmin;"));
-        try {
-            response = closeableHttpClient.execute(httpGet);
-            String res = EntityUtils.toString(response.getEntity(), CHARSET_UTF8);
-            return new CommonResponseDTO(200, res, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new CommonResponseDTO(500, null, e.getMessage());
-        }
+        response = closeableHttpClient.execute(httpGet);
+        String res = EntityUtils.toString(response.getEntity(), CHARSET_UTF8);
+        return CommonResponseDTO.success(res);
     }
 
     @RequestMapping(value = "post", method = RequestMethod.POST)
     public CommonResponseDTO forwardPost(@RequestParam String target,
-                                         @RequestBody Map<String, String> params) {
+                                         @RequestBody Map<String, String> params) throws IOException {
         CloseableHttpClient closeableHttpClient;
         CloseableHttpResponse response;
         closeableHttpClient = HttpClients.createDefault();
         HttpPost post = new HttpPost(target);
-//        post.setHeader(new BasicHeader("Cookie", "letv_user_name=shangmin;"));
         List<NameValuePair> list = new ArrayList<>();
         if (params != null) {
             Set<String> keys = params.keySet();
@@ -59,20 +52,11 @@ public class HttpForwardController implements Constant {
                 String key = keyIterator.next();
                 list.add(new BasicNameValuePair(key, params.get(key)));
             }
-            try {
-                post.setEntity(new UrlEncodedFormEntity(list, CHARSET_UTF8));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                return new CommonResponseDTO(500, null, e.getMessage());
-            }
+            post.setEntity(new UrlEncodedFormEntity(list, CHARSET_UTF8));
+
         }
-        try {
-            response = closeableHttpClient.execute(post);
-            String res = EntityUtils.toString(response.getEntity(), CHARSET_UTF8);
-            return new CommonResponseDTO(200, res, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new CommonResponseDTO(500, null, e.getMessage());
-        }
+        response = closeableHttpClient.execute(post);
+        String res = EntityUtils.toString(response.getEntity(), CHARSET_UTF8);
+        return CommonResponseDTO.success(res);
     }
 }

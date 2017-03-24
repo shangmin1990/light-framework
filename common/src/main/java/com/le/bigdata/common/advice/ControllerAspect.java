@@ -45,16 +45,17 @@ public class ControllerAspect implements Constant {
             printWriter = response.getWriter();
             response.setCharacterEncoding(Constant.CHARSET_UTF8);
             response.setContentType("application/json;charset=utf-8");
-            CommonResponseDTO commonResponseDTO = new CommonResponseDTO();
-//            commonResponseDTO.setSuccess(false);
+            int errorCode = 500;
             if(e instanceof BusinessServiceException){
                 BusinessServiceException ex = (BusinessServiceException) e;
-                commonResponseDTO.setCode(ex.getCode());
+                errorCode = ex.getCode();
+                response.setStatus(errorCode);
             } else {
-                commonResponseDTO.setCode(500);
+                // 其他错误一律是500
+                response.setStatus(errorCode);
             }
-            commonResponseDTO.setErrorMsg(e.toString());
-            printWriter.write(JSON.toJSONString(commonResponseDTO));
+            CommonResponseDTO commonResponseDTO = CommonResponseDTO.error(errorCode, e.toString());
+            printWriter.write(commonResponseDTO.toString());
         } catch (IOException e1) {
             e1.printStackTrace();
         } finally {

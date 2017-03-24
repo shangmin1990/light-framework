@@ -58,7 +58,7 @@ public class AuthorizationCodeHandler extends GrantTypeAuthorizationHandlerAdapt
             // 如果cookie是空 而且用户名非空,那就是正在登录验证
             if (WebUtil.getCookieValue(request, DEFAULT_USER_COOKIE_NAME) == null && username != null) {
                 CommonResponseDTO result = login(request);
-                if (result.getCode() != 200) {
+                if (!result.isSuccess()) {
                     try {
                         WebUtil.replyNoAccess(request, response, result.toString());
                     } catch (IOException e) {
@@ -108,7 +108,7 @@ public class AuthorizationCodeHandler extends GrantTypeAuthorizationHandlerAdapt
                 String code = request.getParameter("code");
                 if (code == null || code.isEmpty()) {
                     try {
-                        WebUtil.replyNoAccess(request, response, new CommonResponseDTO(10009, "No Request code found").toString());
+                        WebUtil.replyNoAccess(request, response, CommonResponseDTO.error(10009, "No Request code found").toString());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

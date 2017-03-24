@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.le.bigdata.auth.authentication.PasswordValidator;
 import com.le.bigdata.core.dto.CommonResponseDTO;
+import com.le.bigdata.core.exception.BusinessServiceException;
 import com.le.bigdata.core.util.CodecUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -47,20 +48,20 @@ public class OSSPasswordValidator implements PasswordValidator {
             username = URLDecoder.decode(request.getParameter("username"), "UTF-8");
             password = URLDecoder.decode(request.getParameter("password"), "UTF-8");
             if (username == null || username.isEmpty()) {
-                throw new Exception("用户名不能为空");
+                throw new BusinessServiceException(100000, "用户名不能为空");
             }
             if (password == null || password.isEmpty()) {
-                throw new Exception("密码不能为空");
+                throw new BusinessServiceException(100001, "密码不能为空");
             }
             JSONObject jsonResult = ossLogin(username, password);
             Boolean responseStatus = jsonResult.getJSONObject("respond").getBoolean("status");
-            return new CommonResponseDTO(responseStatus ? 200 : 10000);
+            return CommonResponseDTO.status(responseStatus);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new CommonResponseDTO(10000);
+        return CommonResponseDTO.failure();
 
     }
 

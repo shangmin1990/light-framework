@@ -104,7 +104,7 @@ public class WebUtil implements Constant {
             TokenResponseDTO tokenResponseDTO = new TokenResponseDTO();
             tokenResponseDTO.setAccess_token(token.getValue());
             tokenResponseDTO.setExpires_in(token.getExpires());
-            CommonResponseDTO common = new CommonResponseDTO(200, tokenResponseDTO);
+            CommonResponseDTO common = CommonResponseDTO.success(tokenResponseDTO);
             out.println(common.toString());
         } catch (IOException e) {
             e.printStackTrace();

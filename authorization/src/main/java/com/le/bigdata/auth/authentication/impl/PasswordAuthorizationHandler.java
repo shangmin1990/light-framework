@@ -19,7 +19,7 @@ public class PasswordAuthorizationHandler extends GrantTypeAuthorizationHandlerA
     public void handlePasswordGrantType(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         CommonResponseDTO commonResponseDTO = login(request);
-        boolean result = commonResponseDTO.getCode() == 200;
+        boolean result = commonResponseDTO.isSuccess();
         String username = request.getParameter(USERNAME);
         // 登录成功
         if (result) {

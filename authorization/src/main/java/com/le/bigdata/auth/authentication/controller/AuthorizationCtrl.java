@@ -85,6 +85,6 @@ public class AuthorizationCtrl {
     @ResponseBody
     public CommonResponseDTO revokeToken(@ApiIgnore @CookieValue(ACCESS_TOKEN) String token) throws IOException {
         tokenProvider.deleteToken(token);
-        return new CommonResponseDTO(200);
+        return CommonResponseDTO.success();
     }
 }
