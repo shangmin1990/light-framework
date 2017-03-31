@@ -1,6 +1,5 @@
 package com.le.bigdata.common.advice;
 
-import com.alibaba.fastjson.JSON;
 import com.le.bigdata.core.Constant;
 import com.le.bigdata.core.dto.CommonResponseDTO;
 import com.le.bigdata.core.exception.BusinessServiceException;

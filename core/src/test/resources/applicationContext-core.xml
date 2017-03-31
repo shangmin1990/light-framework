@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <context:annotation-config/>
+
+    <context:property-placeholder ignore-unresolvable="true" location="classpath:jedis.properties"/>
+
+
+    <bean class="com.le.bigdata.core.util.SpringContextUtils"/>
+
+    <!-- 需要将自己的包名加到这里边 例如 com.benjamin.project-->
+    <context:component-scan base-package="
+    com.le.bigdata.core" use-default-filters="true">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <bean class="com.le.bigdata.core.util.JedisPoolUtil">
+        <property name="host" value="${host}"></property>
+        <property name="port" value="${port}"></property>
+        <property name="password" value="${password}"></property>
+        <property name="maxIdle" value="${maxIdle}"></property>
+        <property name="maxTotal" value="${maxTotal}"></property>
+        <property name="maxWaitMillis" value="${maxWait}"></property>
+        <property name="timeout" value="${timeout}"></property>
+    </bean>
+
+</beans>

@@ -1,24 +1,40 @@
 package com.le.bigdata.core.datasource;
 
 /**
- * Created by benjamin on 16/5/23.
+ * 16个数据源槽
  */
 public enum DataSources {
 
-    DMP_DATA_STORE("dmp"),
+    SLOT0,
 
-    MATRIX_DATA_STORE("matrix"),
+    SLOT1,
 
-    MOBILE_LIVE("mLive");
+    SLOT2,
 
-    private String value;
+    SLOT3,
 
-    DataSources(String value) {
-        this.value = value;
-    }
+    SLOT4,
 
-    @Override
-    public String toString() {
-        return this.value;
-    }
+    SLOT5,
+
+    SLOT6,
+
+    SLOT7,
+
+    SLOT8,
+
+    SLOT9,
+
+    SLOT10,
+
+    SLOT11,
+
+    SLOT12,
+
+    SLOT13,
+
+    SLOT14,
+
+    SLOT15
+
 }

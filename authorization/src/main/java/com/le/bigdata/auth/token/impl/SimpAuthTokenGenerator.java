@@ -2,10 +2,13 @@ package com.le.bigdata.auth.token.impl;
 
 import com.le.bigdata.auth.token.IAuthTokenGenerator;
 import com.le.bigdata.auth.token.Token;
+import com.le.bigdata.auth.token.TokenType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.UUID;
 
 /**
@@ -17,73 +20,97 @@ public class SimpAuthTokenGenerator implements IAuthTokenGenerator {
 
     private Logger logger = LoggerFactory.getLogger(SimpAuthTokenGenerator.class);
 
-    //默认配置，可以在oauth.properties中配置此项
-    //Token有效期 (单位天)
-    private long accessTokenExpires = 7 * 24 * 60 * 60 * 1000L;
+    //默认配置，可以在authorization.properties中配置此项
+    //Token有效期 (单位分钟)
+    @Value("${access-token.expires}")
+    private String accessTokenExpires;
     //默认配置，可以在oauth.properties中配置此项
     //AccessToken有效期 10分钟 (默认配置)
-    private long authorizationCodeExpires = 10 * 60 * 1000L;
+    @Value("${authorization-code.expires}")
+    private String authorizationCodeExpires;
     //默认配置，可以在oauth.properties中配置此项
     //永不过期
-    private long refreshTokenExpires = 30 * 24 * 60 * 60 * 1000L;
+    @Value("${refresh-token.expires}")
+    private String refreshTokenExpires;
 
     public long getAccessTokenExpires() {
-        return accessTokenExpires;
+        try{
+            // 如果没有设置 则取默认值
+            long result = Long.parseLong(accessTokenExpires) * 60 * 1000L;
+            return result;
+        } catch (NumberFormatException e){
+            // 默认值: 7天
+            return 7 * 24 * 3600 * 1000L;
+        }
     }
 
-    public void setAccessTokenExpires(long accessTokenExpires) {
+    public void setAccessTokenExpires(String accessTokenExpires) {
         this.accessTokenExpires = accessTokenExpires;
     }
 
     public long getAuthorizationCodeExpires() {
-        return authorizationCodeExpires;
+        try {
+            // 如果没有设置 则取默认值
+            return Long.parseLong(authorizationCodeExpires) * 60 * 1000L;
+        }catch (NumberFormatException e){
+            // 默认值: 10分钟
+            return 10 * 60 * 1000L;
+        }
+
     }
 
-    public void setAuthorizationCodeExpires(long authorizationCodeExpires) {
+    public void setAuthorizationCodeExpires(String authorizationCodeExpires) {
         this.authorizationCodeExpires = authorizationCodeExpires;
     }
 
     public long getRefreshTokenExpires() {
-        return refreshTokenExpires;
+        try {
+            // 如果没有设置 则取默认值
+            return Long.parseLong(refreshTokenExpires) * 60 * 1000L;
+        }catch (NumberFormatException e){
+            // 默认值: 30天
+            return  30 * 24 * 3600 * 1000L;
+        }
     }
 
-    public void setRefreshTokenExpires(long refreshTokenExpires) {
+    public void setRefreshTokenExpires(String refreshTokenExpires) {
         this.refreshTokenExpires = refreshTokenExpires;
     }
 
-    public SimpAuthTokenGenerator() {
-        logger.info("access_token有效期为{}ms", accessTokenExpires);
-        logger.info("refresh_token有效期为{}ms", refreshTokenExpires);
-        logger.info("authorization_code有效期为{}ms", authorizationCodeExpires);
+    @PostConstruct
+    public void init() {
+        logger.info("access_token有效期为{}分钟", getAccessTokenExpires() / 60000);
+        logger.info("refresh_token有效期为{}分钟", getRefreshTokenExpires() / 60000);
+        logger.info("authorization_code有效期为{}分钟", getAuthorizationCodeExpires() / 60000);
     }
 
     @Override
-    public Token generateAuthorizationCode(String name) {
+    public Token generateAuthorizationCode() {
         Token token = generateToken();
         if (token != null) {
-            token.setExpires(authorizationCodeExpires);
-            token.setAuthorizationCode(true);
+            token.setExpires(getAuthorizationCodeExpires());
+            token.setTokenType(TokenType.authorizationCode);
         }
         return token;
     }
 
     @Override
-    public Token generateAccessToken(String name, boolean useRefreshToken) {
+    public Token generateAccessToken(boolean useRefreshToken) {
         Token token = generateToken();
-        if (token != null) {
-            token.setExpires(accessTokenExpires);
-            if (useRefreshToken) {
-                Token refreshToken = generateRefreshToken(name);
-                token.setRefreshToken(refreshToken);
-            }
+        token.setTokenType(TokenType.accessToken);
+        token.setExpires(getAccessTokenExpires());
+        if (useRefreshToken) {
+            Token refreshToken = generateRefreshToken();
+            token.setRefreshToken(refreshToken);
         }
         return token;
     }
 
-    private Token generateRefreshToken(String name) {
+    private Token generateRefreshToken() {
         Token token = generateToken();
         if (token != null) {
-            token.setExpires(refreshTokenExpires);
+            token.setExpires(getRefreshTokenExpires());
+            token.setTokenType(TokenType.refreshToken);
         }
         return token;
     }
@@ -104,8 +131,4 @@ public class SimpAuthTokenGenerator implements IAuthTokenGenerator {
         return token;
     }
 
-    public static void main(String[] args) {
-        Token a = new SimpAuthTokenGenerator().generateToken();
-        System.out.println(a);
-    }
 }

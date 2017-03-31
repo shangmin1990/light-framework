@@ -6,64 +6,78 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import javax.annotation.PostConstruct;
 
 /**
  * Created by benjamin on 2016/10/25.
  */
-public class JedisPoolUtil {
+public class JedisPoolUtil extends JedisPoolConfig {
 
     private static Logger logger = LoggerFactory.getLogger(JedisPoolUtil.class);
 
-    private static JedisPool pool;
+    private JedisPool pool;
 
-    static {
-        String profile = null;
-        if (SpringContextUtils.getApplicationContext() != null) {
-            String[] utils = SpringContextUtils.getApplicationContext().getEnvironment().getDefaultProfiles();
-            if (utils != null && utils.length > 0) {
-                profile = utils[0];
-            }
-        }
+    private String host;
 
-        String filePath = "redis.properties";
+    private int port;
 
-        if (profile != null && !profile.isEmpty()) {
-            filePath = "redis." + profile + ".properties";
-        }
+    private int timeout;
 
-        InputStream inputStream = JedisPoolUtil.class.getClassLoader().getResourceAsStream(filePath);
-        Properties properties = new Properties();
-        try {
-            properties.load(inputStream);
-        } catch (IOException e) {
-            logger.error("Can't load properties file from path: " + filePath);
-        }
-        // 建立连接池配置参数
-        JedisPoolConfig config = new JedisPoolConfig();
+    private String password;
 
-        // 设置最大连接数
-        config.setMaxTotal(Integer.parseInt(properties.getProperty("maxTotal")));
+    private int database = 0;
 
-        // 设置最大阻塞时间，记住是毫秒数milliseconds
-        config.setMaxWaitMillis(Long.parseLong(properties.getProperty("maxWait")));
-
-        // 设置空间连接
-        config.setMaxIdle(Integer.parseInt(properties.getProperty("maxIdle")));
-
-        // 创建连接池
-        pool = new JedisPool(config, properties.getProperty("host"),
-                Integer.parseInt(properties.getProperty("port")),
-                Integer.parseInt(properties.getProperty("timeout")),
-                properties.getProperty("password"),
-                Integer.parseInt(properties.getProperty("database", "0")));
+    public static Logger getLogger() {
+        return logger;
     }
 
+    public static void setLogger(Logger logger) {
+        JedisPoolUtil.logger = logger;
+    }
 
-    private JedisPoolUtil() {
+    public String getHost() {
+        return host;
+    }
 
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public int getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(int database) {
+        this.database = database;
+    }
+
+    @PostConstruct
+    public void init(){
+        pool = new JedisPool(this, host, port, timeout, password, database);
     }
 
     /**
@@ -71,7 +85,7 @@ public class JedisPoolUtil {
      *
      * @return
      */
-    public static Jedis getJedis() {
+    public Jedis getJedis() {
         return pool.getResource();
     }
 

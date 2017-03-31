@@ -1,17 +1,17 @@
 package com.le.bigdata.auth.authentication.controller;
 
 import com.le.bigdata.auth.authentication.AuthorizationHandler;
+import com.le.bigdata.auth.permission.Privilege;
+import com.le.bigdata.auth.permission.model.ACLEnum;
 import com.le.bigdata.auth.token.IAuthTokenProvider;
+import com.le.bigdata.auth.token.Token;
+import com.le.bigdata.auth.token.TokenType;
 import com.le.bigdata.core.dto.CommonResponseDTO;
-
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.PostConstruct;
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.le.bigdata.core.Constant.ACCESS_TOKEN;
+import static com.le.bigdata.core.Constant.USER_COOKIE_NAME;
 
 /**
  * 登录权限相关的ctrl
@@ -46,7 +47,7 @@ public class AuthorizationCtrl {
     @PostConstruct
     public void init() {
         authorizationHandlers.add(password);
-        authorizationHandlers.add(authorizationCode);
+//        authorizationHandlers.add(authorizationCode);
     }
 
     public IAuthTokenProvider getTokenProvider() {
@@ -84,7 +85,16 @@ public class AuthorizationCtrl {
     @ApiOperation("登出接口")
     @ResponseBody
     public CommonResponseDTO revokeToken(@ApiIgnore @CookieValue(ACCESS_TOKEN) String token) throws IOException {
-        tokenProvider.deleteToken(token);
+        tokenProvider.deleteToken(token, TokenType.accessToken);
         return CommonResponseDTO.success();
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "refresh_token")
+    @ApiOperation("通过refresh_token 获取新的token")
+    @ResponseBody
+    public CommonResponseDTO refreshToken(@ApiIgnore @CookieValue(USER_COOKIE_NAME) String username,
+                                          @RequestParam("refresh_token") String refreshToken) throws IOException {
+        Token token = tokenProvider.newTokenFromRefreshToken(username, refreshToken);
+        return CommonResponseDTO.success(token);
     }
 }

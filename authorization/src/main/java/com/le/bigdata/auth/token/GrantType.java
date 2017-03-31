@@ -1,7 +1,7 @@
 package com.le.bigdata.auth.token;
 
 /**
- * Created by benjamin on 9/4/14.
+ * OAuth2.0 四种认证模式 目前支持 用户名密码授权模式
  */
 public enum GrantType {
     // 用户名密码授权模式

@@ -1,7 +1,7 @@
 package com.le.bigdata.common.dao.typehandler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.le.bigdata.core.util.JSONUtil;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
 import org.apache.ibatis.type.TypeHandler;
@@ -26,7 +26,6 @@ public class JSONTypeHandler implements TypeHandler<JSONObject> {
     private static final Logger logger = LoggerFactory.getLogger(JSONTypeHandler.class);
 
     /**
-     * 因为我们从库中都是读操作,库中的数据由hive生成,所以此方法可以不用重写
      *
      * @param ps
      * @param i
@@ -36,7 +35,7 @@ public class JSONTypeHandler implements TypeHandler<JSONObject> {
      */
     @Override
     public void setParameter(PreparedStatement ps, int i, JSONObject parameter, JdbcType jdbcType) throws SQLException {
-
+        ps.setString(i, parameter.toJSONString());
     }
 
     @Override
@@ -45,7 +44,7 @@ public class JSONTypeHandler implements TypeHandler<JSONObject> {
         String original = rs.getString(columnName);
         JSONObject jsonObject = null;
         try {
-            jsonObject = JSONUtil.parseJSONObject(original);
+            jsonObject = JSON.parseObject(original);
         } catch (Exception e) {
             logger.error("JSON ParseError, Column:{}", columnName);
             return null;
@@ -59,7 +58,7 @@ public class JSONTypeHandler implements TypeHandler<JSONObject> {
     public JSONObject getResult(ResultSet rs, int columnIndex) throws SQLException {
         String original = rs.getString(columnIndex);
         try {
-            return JSONUtil.parseJSONObject(original);
+            return JSON.parseObject(original);
         } catch (Exception e) {
             logger.error("JSON ParseError, Column:{}", columnIndex);
             return null;
@@ -70,16 +69,11 @@ public class JSONTypeHandler implements TypeHandler<JSONObject> {
     public JSONObject getResult(CallableStatement cs, int columnIndex) throws SQLException {
         String original = cs.getString(columnIndex);
         try {
-            return JSONUtil.parseJSONObject(original);
+            return JSON.parseObject(original);
         } catch (Exception e) {
             logger.error("JSON ParseError, Column:{}", columnIndex);
             return null;
         }
     }
 
-
-    public static void main(String[] args) throws Exception {
-        String original = "公司/企业职员:48523;私营个体户:19773;自由职业者:19225;其他:18631;政府/事业单位工作人员:13041;在校学生:8797;中高级管理人员:6885;职员:5257;专业/技术人员:4822;学生:1757;工人:1598;临时/兼职工:1049;无工作/退休:921;无:439";
-        JSONUtil.parseJSONObject(original);
-    }
 }

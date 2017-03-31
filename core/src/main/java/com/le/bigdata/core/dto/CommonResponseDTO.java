@@ -1,7 +1,6 @@
 package com.le.bigdata.core.dto;
 
 import com.alibaba.fastjson.JSON;
-import com.le.bigdata.core.exception.BusinessServiceException;
 
 import java.io.Serializable;
 

@@ -9,7 +9,7 @@ public interface IAuthTokenGenerator {
      *
      * @return
      */
-    Token generateAuthorizationCode(String name);
+    Token generateAuthorizationCode();
 
     /**
      * 生成访问令牌
@@ -17,6 +17,6 @@ public interface IAuthTokenGenerator {
      * @param userRefreshToken 是否生成刷新令牌
      * @return
      */
-    Token generateAccessToken(String name, boolean userRefreshToken);
+    Token generateAccessToken(boolean userRefreshToken);
 
 }

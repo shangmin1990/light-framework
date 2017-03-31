@@ -2,6 +2,7 @@ package com.le.bigdata.auth.permission;
 
 import com.le.bigdata.auth.permission.impl.LebiPermissionManagerImpl;
 import com.le.bigdata.auth.permission.model.ACLEnum;
+import org.springframework.context.annotation.Profile;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

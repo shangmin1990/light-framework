@@ -1,6 +1,7 @@
 package com.le.bigdata.auth.authentication.impl;
 
 import com.le.bigdata.auth.token.Token;
+import com.le.bigdata.auth.token.TokenType;
 import com.le.bigdata.auth.util.WebUtil;
 import com.le.bigdata.core.dto.CommonResponseDTO;
 import org.springframework.stereotype.Component;
@@ -20,17 +21,22 @@ public class PasswordAuthorizationHandler extends GrantTypeAuthorizationHandlerA
 
         CommonResponseDTO commonResponseDTO = login(request);
         boolean result = commonResponseDTO.isSuccess();
-        String username = request.getParameter(USERNAME);
+        String username = request.getParameter(requestParamUsername);
         // 登录成功
         if (result) {
             // access_token
-            String tokenValue = getTokenProvider().getAccessToken(username);
-            Token token = getAuthTokenGenerator().generateAccessToken(username, false);
+            String tokenValue = getTokenProvider().getToken(username, TokenType.accessToken);
+            // 每一次登录都要换一个新的token
+            // 用户名密码模式不需要refresh_token
+            Token token = getAuthTokenGenerator().generateAccessToken(false);
             if (tokenValue != null && !tokenValue.isEmpty()) {
                 token.setValue(tokenValue);
             }
             getTokenProvider().saveToken(username, token);
-            WebUtil.response(request, response, token);
+
+            setLoginSuccessCookies(request, response, token, username);
+
+            WebUtil.response(request, response, token, access_token_cookie_name, username_cookie_name);
         } else {
             try {
                 WebUtil.replyNoAccess(request, response, commonResponseDTO.toString());
@@ -40,4 +46,6 @@ public class PasswordAuthorizationHandler extends GrantTypeAuthorizationHandlerA
         }
         super.handlePasswordGrantType(request, response);
     }
+
+
 }

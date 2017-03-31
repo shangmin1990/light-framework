@@ -16,6 +16,10 @@ public class TokenResponseDTO {
     // 只有access_token才是用户授权的唯一票据。
     private String username;
 
+    private String accessTokenCookieName;
+
+    private String usernameCookieName;
+
     // 重新获取token时使用的token
     private String refresh_token;
 
@@ -41,6 +45,22 @@ public class TokenResponseDTO {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getAccessTokenCookieName() {
+        return accessTokenCookieName;
+    }
+
+    public void setAccessTokenCookieName(String accessTokenCookieName) {
+        this.accessTokenCookieName = accessTokenCookieName;
+    }
+
+    public String getUsernameCookieName() {
+        return usernameCookieName;
+    }
+
+    public void setUsernameCookieName(String usernameCookieName) {
+        this.usernameCookieName = usernameCookieName;
     }
 
     public String getRefresh_token() {

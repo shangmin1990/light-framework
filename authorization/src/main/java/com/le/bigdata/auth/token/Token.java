@@ -17,10 +17,9 @@ public class Token implements Comparator<Token>, Serializable {
     private long generatorTime = new Date().getTime();
     // 有效期
     private long expires;
-    // 是否是临时token
-    private boolean authorizationCode;
 
-    private boolean refresh;
+    private TokenType tokenType;
+
     // 此token的刷新token
     private Token refreshToken;
 
@@ -28,12 +27,12 @@ public class Token implements Comparator<Token>, Serializable {
 
     }
 
-    public boolean isAuthorizationCode() {
-        return authorizationCode;
+    public TokenType getTokenType() {
+        return tokenType;
     }
 
-    public void setAuthorizationCode(boolean authorizationCode) {
-        this.authorizationCode = authorizationCode;
+    public void setTokenType(TokenType tokenType) {
+        this.tokenType = tokenType;
     }
 
     public void setValue(String value) {
@@ -42,26 +41,6 @@ public class Token implements Comparator<Token>, Serializable {
 
     public String getValue() {
         return value;
-    }
-
-//  public String getKey(){
-//    String value = this.getValue();
-//    if(value == null){
-//      return null;
-//    }
-//    String[] strings = value.split(TOKEN_SEPARATOR);
-//    if(strings.length == 0){
-//      return null;
-//    }
-//    return strings[0];
-//  }
-
-    public boolean isRefresh() {
-        return refresh;
-    }
-
-    public void setRefresh(boolean refresh) {
-        this.refresh = refresh;
     }
 
     public long getGeneratorTime() {
@@ -81,7 +60,9 @@ public class Token implements Comparator<Token>, Serializable {
     }
 
     public Token getRefreshToken() {
-        return refreshToken;
+        if (this.getTokenType() == TokenType.accessToken)
+            return refreshToken;
+        return null;
     }
 
     public void setRefreshToken(Token refreshToken) {
@@ -111,12 +92,19 @@ public class Token implements Comparator<Token>, Serializable {
     @Override
     public String toString() {
         String str = "[ value = " + this.getValue() + ", generateTime = " + generatorTime + ", expires = " + expires;
-        String tokenType = ACCESS_TOKEN;
-        if (authorizationCode) {
-            tokenType = "code";
-        } else if (refresh) {
-            tokenType = "refresh_token";
+        String tokenType = null;
+        switch (this.tokenType){
+            case authorizationCode:
+                tokenType = "code";
+                break;
+            case refreshToken:
+                tokenType = "refresh_token";
+                break;
+            case accessToken:
+                tokenType = ACCESS_TOKEN;
+                break;
         }
+
         str += ", tokenType = " + tokenType;
         if (refreshToken != null) {
             str += ", refreshToken = " + refreshToken.toString();
@@ -124,10 +112,5 @@ public class Token implements Comparator<Token>, Serializable {
         str += " ]";
         return str;
     }
-
-    public static void main(String[] args) {
-        String a = "a~~b";
-        String[] strings = a.split("~~");
-        System.out.println(strings[0]);
-    }
 }
+

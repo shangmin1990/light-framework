@@ -10,6 +10,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
@@ -25,6 +26,9 @@ import java.util.concurrent.TimeUnit;
 @Aspect
 @Order(3)
 public class JedisResultCacheAspect {
+
+    @Autowired
+    private JedisPoolUtil jedisPoolUtil;
 
     private static Logger logger = LoggerFactory.getLogger(JedisResultCacheAspect.class);
 
@@ -59,7 +63,7 @@ public class JedisResultCacheAspect {
             jsonObject.put("path", path);
             jsonObject.put("queryString", queryString);
             String key = jsonObject.toJSONString();
-            Jedis jedis = JedisPoolUtil.getJedis();
+            Jedis jedis = jedisPoolUtil.getJedis();
             long begin = System.nanoTime();
             String str = jedis.get(key);
             long end = System.nanoTime();

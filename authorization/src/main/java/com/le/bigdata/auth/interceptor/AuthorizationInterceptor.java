@@ -3,6 +3,7 @@ package com.le.bigdata.auth.interceptor;
 import com.le.bigdata.auth.handler.IRequestHandler;
 import com.le.bigdata.auth.token.IAuthTokenProvider;
 import com.le.bigdata.auth.token.Token;
+import com.le.bigdata.auth.token.TokenType;
 import com.le.bigdata.auth.util.WebUtil;
 import com.le.bigdata.core.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +29,6 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
     private ServletContext servletContext;
 
     private String loginUrl;
-
-    private String loginSuccessUrl;
-
-    private String loginErrorUrl;
 
     // 启用请求参数 code验证
     private boolean verifyCodeEnable = true;
@@ -60,6 +57,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         if (loginUrl == null || loginUrl.isEmpty()) {
             loginUrl = servletContext.getContextPath() + "/login.html";
         }
+
         //servletContext.getContextPath();
     }
 
@@ -68,6 +66,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         String cookieTokenValue = WebUtil.getCookieValue(request, Constant.ACCESS_TOKEN);
         String username = WebUtil.getCookieValue(request, Constant.USERNAME);
         Token token = new Token();
+        token.setTokenType(TokenType.accessToken);
         token.setValue(cookieTokenValue);
         // 没有传递token 或者token已经过期
         // 不用refresh Token了 直接跳转到登录页

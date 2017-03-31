@@ -12,7 +12,7 @@ public class DataSourceHolder {
     private static final ThreadLocal<DataSources> datasourceHolder = new ThreadLocal<DataSources>() {
         @Override
         protected DataSources initialValue() {
-            return DataSources.MATRIX_DATA_STORE;
+            return DataSources.SLOT0;
         }
     };
 
@@ -25,6 +25,6 @@ public class DataSourceHolder {
     }
 
     public static void reset() {
-        datasourceHolder.set(DataSources.MATRIX_DATA_STORE);
+        datasourceHolder.set(DataSources.SLOT0);
     }
 }

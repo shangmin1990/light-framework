@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 public class GrantTypeAuthorizationHandlerAdapter extends AbstractAuthorizationHandler {
 
-
     @Override
     public void handlePasswordGrantType(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -30,6 +29,5 @@ public class GrantTypeAuthorizationHandlerAdapter extends AbstractAuthorizationH
     public void handleClientGrantType(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
     }
-
 
 }

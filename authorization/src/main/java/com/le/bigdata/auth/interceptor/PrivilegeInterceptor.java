@@ -4,9 +4,13 @@ import com.le.bigdata.auth.permission.IPermissionValidator;
 import com.le.bigdata.auth.permission.Privilege;
 import com.le.bigdata.auth.permission.model.ACLEnum;
 import com.le.bigdata.auth.util.WebUtil;
+import com.le.bigdata.core.bean.BeanCreateFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -19,34 +23,20 @@ import static com.le.bigdata.core.Constant.USERNAME;
  */
 public class PrivilegeInterceptor extends HandlerInterceptorAdapter {
 
-//    private String accessTokenCookieKey = ACCESS_TOKEN;
+    @Value("${cookie.username.name}")
+    private String usernameCookieKey;
 
-    private String usernameCookieKey = USERNAME;
-
-    private ConcurrentHashMap<String, IPermissionValidator> cache = new ConcurrentHashMap<>();
-
-//    public String getAccessTokenCookieKey() {
-//        return accessTokenCookieKey;
-//    }
-//
-//    public void setAccessTokenCookieKey(String accessTokenCookieKey) {
-//        this.accessTokenCookieKey = accessTokenCookieKey;
-//    }
-
-    public String getUsernameCookieKey() {
-        return usernameCookieKey;
-    }
-
-    public void setUsernameCookieKey(String usernameCookieKey) {
-        this.usernameCookieKey = usernameCookieKey;
+    @PostConstruct
+    public void init(){
+        if(usernameCookieKey == null
+                || usernameCookieKey.isEmpty()
+                || usernameCookieKey.equals("${cookie.username.name}")){
+            usernameCookieKey = USERNAME;
+        }
     }
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-//        String cookieTokenValue = WebUtil.getCookieValue(request, accessTokenCookieKey);
         String username = WebUtil.getCookieValue(request, usernameCookieKey);
-//        Token token = new Token();
-//        token.setValue(cookieTokenValue);
-//        String username = token.getKey();
         if (handler instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             Privilege privilege = getAnnotation(handlerMethod);
@@ -57,13 +47,9 @@ public class PrivilegeInterceptor extends HandlerInterceptorAdapter {
             ACLEnum[] needed = privilege.needed();
 
             Class<? extends IPermissionValidator> clazz = privilege.permissionValidator();
-            String name = clazz.getName();
 
-            if (!cache.containsKey(name)) {
-                IPermissionValidator permissionManager = clazz.newInstance();
-                cache.putIfAbsent(name, permissionManager);
-            }
-            IPermissionValidator permissionManager = cache.get(name);
+            IPermissionValidator permissionManager = BeanCreateFactory.getBean(clazz, true);
+
             boolean result = permissionManager.hasPermission(username, resourceIds, needed);
             if (!result) {
                 WebUtil.replyNoAccess(request, response, username + "没有访问" + Arrays.toString(resourceIds) + "资源的权限");

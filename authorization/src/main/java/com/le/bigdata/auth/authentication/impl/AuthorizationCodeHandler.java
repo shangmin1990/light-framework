@@ -3,6 +3,7 @@ package com.le.bigdata.auth.authentication.impl;
 import com.le.bigdata.auth.client.IClientManager;
 import com.le.bigdata.auth.client.impl.ClientManager;
 import com.le.bigdata.auth.token.Token;
+import com.le.bigdata.auth.token.TokenType;
 import com.le.bigdata.auth.util.WebUtil;
 import com.le.bigdata.core.dto.CommonResponseDTO;
 import com.le.bigdata.core.util.PropertiesUtil;
@@ -29,13 +30,11 @@ public class AuthorizationCodeHandler extends GrantTypeAuthorizationHandlerAdapt
 
     @Override
     public void handleAuthCodeGrantType(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        // 用户名cookie
-        String userCookieName = PropertiesUtil.getString(USER_COOKIE_NAME, DEFAULT_USER_COOKIE_NAME);
         //尝试从cookie中读取user
-        String username = WebUtil.getCookieValue(request, userCookieName);
+        String username = WebUtil.getCookieValue(request, username_cookie_name);
         //如果cookie中没有user 第一,没有登录,第二,正在登录
         if (username == null) {
-            username = request.getParameter("username");
+            username = request.getParameter(requestParamUsername);
         }
         String responseType = request.getParameter(RESPONSE_TYPE);
         String clientId = request.getParameter(CLIENT_ID);
@@ -70,7 +69,7 @@ public class AuthorizationCodeHandler extends GrantTypeAuthorizationHandlerAdapt
 
             String state = request.getParameter(STATE);
             if (clientManager.checkClientId(clientId)) {
-                Token token = getAuthTokenGenerator().generateAccessToken(username, false);
+                Token token = getAuthTokenGenerator().generateAccessToken(true);
                 getTokenProvider().saveToken(username, token);
 //        req.getRequestDispatcher("access_token?code="+token.getValue()+"&redirect_uri="+redirect_uri+"&state="+state+"&grant_type=authorization_code").forward(req, resp);
                 if (redirect_uri == null || redirect_uri.isEmpty()) {
@@ -113,12 +112,14 @@ public class AuthorizationCodeHandler extends GrantTypeAuthorizationHandlerAdapt
                         e.printStackTrace();
                     }
                 } else {
+                    Token token_code = new Token();
+                    token_code.setTokenType(TokenType.authorizationCode);
                     if (username == null) {
                         username = (String) request.getAttribute("user");
                     }
-                    String value = getTokenProvider().getAuthorizationCode(username);
-                    if (value.equals(code)) {
-                        Token token = getAuthTokenGenerator().generateAccessToken(username, false);
+                    boolean result = getTokenProvider().checkToken(username, token_code);
+                    if (result) {
+                        Token token = getAuthTokenGenerator().generateAccessToken(false);
                         getTokenProvider().saveToken(username, token);
                         try {
                             response.sendRedirect(redirect_uri);

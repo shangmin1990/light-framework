@@ -9,13 +9,13 @@
         <spring.version>4.1.5.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jcl.slf4j.version>1.7.12</jcl.slf4j.version>
-        <platform.project.version>1.2.3-SNAPSHOT</platform.project.version>
+        <platform.project.version>1.3.0-SNAPSHOT</platform.project.version>
     </properties>
 
     <groupId>com.le.bigdata</groupId>
     <artifactId>light-framework</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.3-SNAPSHOT</version>
+    <version>1.3.0-SNAPSHOT</version>
     <modules>
         <module>authorization</module>
         <module>core</module>

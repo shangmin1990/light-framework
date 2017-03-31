@@ -91,7 +91,7 @@ public class WebUtil implements Constant {
         return requestType != null && requestType.toLowerCase().equals(XMLHTTPREQUEST);
     }
 
-    public static void response(HttpServletRequest request, HttpServletResponse httpServletResponse, Token token) {
+    public static void response(HttpServletRequest request, HttpServletResponse httpServletResponse, Token token, String access_token_name, String username_cookie_name) {
 //        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         //String encoding = httpServletRequest.getCharacterEncoding();
         httpServletResponse.setContentType("application/json;charset=UTF-8");
@@ -104,6 +104,8 @@ public class WebUtil implements Constant {
             TokenResponseDTO tokenResponseDTO = new TokenResponseDTO();
             tokenResponseDTO.setAccess_token(token.getValue());
             tokenResponseDTO.setExpires_in(token.getExpires());
+            tokenResponseDTO.setAccessTokenCookieName(access_token_name);
+            tokenResponseDTO.setUsernameCookieName(username_cookie_name);
             CommonResponseDTO common = CommonResponseDTO.success(tokenResponseDTO);
             out.println(common.toString());
         } catch (IOException e) {

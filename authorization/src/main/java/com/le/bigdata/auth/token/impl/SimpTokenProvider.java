@@ -1,7 +1,7 @@
 package com.le.bigdata.auth.token.impl;
 
-import com.le.bigdata.auth.token.IAuthTokenProvider;
 import com.le.bigdata.auth.token.Token;
+import com.le.bigdata.auth.token.TokenType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * Singleton
  * Created by benjamin on 9/4/14.
  */
-public class SimpTokenProvider implements IAuthTokenProvider {
+@Deprecated
+public class SimpTokenProvider extends AbstractTokenProvider {
 
     private Logger logger = LoggerFactory.getLogger(SimpTokenProvider.class);
 
@@ -50,60 +51,75 @@ public class SimpTokenProvider implements IAuthTokenProvider {
     @Override
     public boolean checkToken(String key, Token tokenValue) {
 
-        if (tokenValue.isAuthorizationCode()) {
-            return codes.contains(key);
-        } else if (tokenValue.isRefresh()) {
-            return refreshTokens.contains(key);
-        } else {
-            return accessTokens.contains(key);
+        if(key == null || key.isEmpty() || tokenValue != null){
+            return false;
         }
+
+        switch (tokenValue.getTokenType()){
+            case accessToken:
+                return tokenValue.equals(accessTokens.get(key));
+            case refreshToken:
+                return tokenValue.equals(refreshTokens.get(key));
+            case authorizationCode:
+                return tokenValue.equals(codes.get(key));
+        }
+        return false;
     }
 
     @Override
     public void saveToken(String key, Token token) {
-        if (key != null) {
-            if (token.isAuthorizationCode()) {
-                codes.put(key, token);
-            } else if (token.isRefresh()) {
-                refreshTokens.put(key, token);
-            } else {
-                accessTokens.put(key, token);
-            }
+
+        switch (token.getTokenType()){
+            case accessToken:
+                accessTokens.putIfAbsent(key, token);
+                break;
+            case refreshToken:
+                refreshTokens.putIfAbsent(key, token);
+                break;
+            case authorizationCode:
+                codes.putIfAbsent(key, token);
+                break;
+        }
+        if(token.getRefreshToken() != null){
+            saveToken(key, token.getRefreshToken());
         }
     }
 
     @Override
-    public String getAccessToken(String key) {
-        if (key != null) {
-            Token token = accessTokens.get(key);
-            return token.getValue();
+    public String getToken(String key, TokenType tokenType) {
+        Token token = null;
+        switch (tokenType){
+            case accessToken:
+                token = accessTokens.get(key);
+                break;
+            case refreshToken:
+                token = refreshTokens.get(key);
+                break;
+            case authorizationCode:
+                token = codes.get(key);
+                break;
         }
-        return null;
+        if(token == null){
+            return null;
+        }
+        return token.getValue();
     }
 
     @Override
-    public String getAuthorizationCode(String key) {
-        return key == null ? null : codes.get(key).getValue();
-    }
-
-    @Override
-    public String refreshToken(Token token) {
-
-        return null;
-    }
-
-    @Override
-    public void deleteToken(String key) {
-        if (accessTokens.containsKey(key)) {
-            accessTokens.remove(key);
-        }
-        if (refreshTokens.contains(key)) {
-            refreshTokens.remove(key);
-        }
-        if (accessTokens.contains(key)) {
-            accessTokens.remove(key);
+    public void deleteToken(String key, TokenType tokenType) {
+        switch (tokenType){
+            case accessToken:
+                accessTokens.remove(key);
+                break;
+            case refreshToken:
+                refreshTokens.remove(key);
+                break;
+            case authorizationCode:
+                codes.remove(key);
+                break;
         }
     }
+
 
     @Override
     public void destroy() {
