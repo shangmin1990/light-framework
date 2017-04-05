@@ -27,11 +27,14 @@ import java.lang.reflect.Method;
 public class DataSourceServiceAspect {
 
     // Service 带有
-    @Pointcut("(@within(org.springframework.transaction.annotation.Transactional) " +
-            "|| @annotation(org.springframework.transaction.annotation.Transactional) ) " +
-            "&& (@annotation(com.le.bigdata.core.datasource.annotation.DataSource) " +
-            "|| @within(com.le.bigdata.core.datasource.annotation.DataSource))")
+//    @Pointcut("(@within(org.springframework.transaction.annotation.Transactional) " +
+//            "|| @annotation(org.springframework.transaction.annotation.Transactional) ) " +
+//            "&& (@annotation(com.le.bigdata.core.datasource.annotation.DataSource) " +
+//            "|| @within(com.le.bigdata.core.datasource.annotation.DataSource))")
 //    @Pointcut("@annotation(com.le.bigdata.core.datasource.annotation.DataSource) || @within(com.le.bigdata.core.datasource.annotation.DataSource)")
+    // 如果使用以上两种拦截表达式则无法拦截继承与BaseService的方法执行
+    @Pointcut("@within(org.springframework.transaction.annotation.Transactional) " +
+            "|| @annotation(org.springframework.transaction.annotation.Transactional)")
     public void dataSourcePointcut() {
     }
 

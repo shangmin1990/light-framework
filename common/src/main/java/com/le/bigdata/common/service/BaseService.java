@@ -6,6 +6,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 
@@ -60,4 +61,15 @@ public abstract class BaseService<ID extends Comparable<ID>, MODEL> implements I
         return MAPPER.deleteByPrimaryKey(id) == 1;
     }
 
+    public List<MODEL> selectByCondition(Example example){
+        return MAPPER.selectByExample(example);
+    }
+
+    public boolean deleteByCondition(Example example){
+        return MAPPER.deleteByExample(example) > 0;
+    }
+
+    public boolean updateByCondition(MODEL record, Example example){
+        return MAPPER.updateByExampleSelective(record, example) > 0;
+    }
 }

@@ -1,11 +1,17 @@
 package com.le.bigdata.auth.handler.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.le.bigdata.auth.handler.IRequestHandler;
 import com.le.bigdata.core.util.CodecUtil;
+import com.le.bigdata.core.util.JSONUtil;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -43,23 +49,28 @@ public class ValidCodeRequestHandler implements IRequestHandler {
      * @param request
      * @return
      */
-    private String sortedParam(HttpServletRequest request) {
-        List<String> params = new ArrayList<String>();
-        Enumeration<String> enumeration = request.getParameterNames();
-        while (enumeration.hasMoreElements()) {
-            params.add(enumeration.nextElement());
+    private String sortedParam(HttpServletRequest request) throws IOException {
+        String contentType = request.getContentType();
+        // 目前只验证表单类型的数据
+        if (contentType.contains("application/www-x-form-urlencoded")){
+            List<String> params = new ArrayList<String>();
+            Enumeration<String> enumeration = request.getParameterNames();
+            while (enumeration.hasMoreElements()) {
+                params.add(enumeration.nextElement());
+            }
+            Collections.sort(params, String.CASE_INSENSITIVE_ORDER);
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String paramName : params) {
+                stringBuilder.append(paramName);
+                stringBuilder.append("=");
+                stringBuilder.append(request.getParameter(paramName));
+                stringBuilder.append("&");
+            }
+            if (stringBuilder.toString().isEmpty()) {
+                return null;
+            }
+            return stringBuilder.toString().substring(0, stringBuilder.length() - 1);
         }
-        Collections.sort(params, String.CASE_INSENSITIVE_ORDER);
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String paramName : params) {
-            stringBuilder.append(paramName);
-            stringBuilder.append("=");
-            stringBuilder.append(request.getParameter(paramName));
-            stringBuilder.append("&");
-        }
-        if (stringBuilder.toString().isEmpty()) {
-            return null;
-        }
-        return stringBuilder.toString().substring(0, stringBuilder.length() - 1);
+        return null;
     }
 }

@@ -1,6 +1,7 @@
 package com.le.bigdata.common.service;
 
 import org.apache.ibatis.session.RowBounds;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 
@@ -64,4 +65,26 @@ public interface IBaseService<ID extends Comparable<ID>, MODEL> {
      * @return true 删除成功, false删除失败
      */
     boolean deleteByPrimaryKey(ID id);
+
+    /**
+     * 通过通用条件查询
+     * @param example
+     * @return
+     */
+    List<MODEL> selectByCondition(Example example);
+
+    /**
+     * 通过通用条件删除
+     * @param example
+     * @return
+     */
+    boolean deleteByCondition(Example example);
+
+    /**
+     * 通过通用条件更新
+     * @param record
+     * @param example
+     * @return
+     */
+    boolean updateByCondition(MODEL record, Example example);
 }

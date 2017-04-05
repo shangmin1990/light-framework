@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Created by benjamin on 2016/12/14.
  * 1.登录检查
- * 2.如果请求有参数,验证valid_code的值,保证请求不会被篡改.
+ * 2.如果请求有参数,验证Verify-Code的值,保证请求不会被篡改.
  */
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 
@@ -30,8 +30,8 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 
     private String loginUrl;
 
-    // 启用请求参数 code验证
-    private boolean verifyCodeEnable = true;
+    // 请求参数code验证 默认关闭
+    private boolean verifyCodeEnable = false;
 
     @Autowired
     private IRequestHandler requestHandler;
