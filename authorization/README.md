@@ -3,9 +3,9 @@
 ## maven
 ```xml
 <dependency>
-    <groupId>com.le.bigdata</groupId>
+    <groupId>shmin.net</groupId>
     <artifactId>authorization</artifactId>
-    <version>1.3.0-SNAPSHOT</version>
+    <version>1.3.1-SNAPSHOT</version>
 </dependency>
 ```
 ## 实现PasswordValidator
