@@ -36,7 +36,7 @@ public class PasswordAuthorizationHandler extends GrantTypeAuthorizationHandlerA
 
             setLoginSuccessCookies(request, response, token, username);
 
-            WebUtil.response(request, response, token, access_token_cookie_name, username_cookie_name);
+            WebUtil.response(request, response, token, access_token_cookie_name, username_cookie_name, commonResponseDTO.getData());
         } else {
             try {
                 WebUtil.replyNoAccess(request, response, commonResponseDTO.toString());

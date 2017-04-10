@@ -20,6 +20,8 @@ public class TokenResponseDTO {
 
     private String usernameCookieName;
 
+    private Object data;
+
     // 重新获取token时使用的token
     private String refresh_token;
 
@@ -61,6 +63,14 @@ public class TokenResponseDTO {
 
     public void setUsernameCookieName(String usernameCookieName) {
         this.usernameCookieName = usernameCookieName;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 
     public String getRefresh_token() {
