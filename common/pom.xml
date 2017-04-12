@@ -7,7 +7,7 @@
     <parent>
         <artifactId>light-framework</artifactId>
         <groupId>net.shmin</groupId>
-        <version>1.3.1-SNAPSHOT</version>
+        <version>v2.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -38,7 +38,7 @@
         <dependency>
             <groupId>net.shmin</groupId>
             <artifactId>core</artifactId>
-            <version>${platform.project.version}</version>
+            <version>v2.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

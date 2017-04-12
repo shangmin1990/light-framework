@@ -9,6 +9,7 @@ logs/
 target/
 *~
 *.swap
+*.versionsBackup
 src/main/webapp/uploads
 src/main/webapp/WEB-INF/lib
 src/main/webapp/WEB-INF/classes

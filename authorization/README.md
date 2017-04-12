@@ -31,7 +31,7 @@ ublic class CustomValidator implements PasswordValidator {
             <mvc:exclude-mapping path="/authorize"/>
             <!-- 其他不需要登录验证的接口 -->
             <mvc:exclude-mapping path="/other_path"/>
-            <bean class="com.le.bigdata.auth.interceptor.AuthorizationInterceptor">
+            <bean class="AuthorizationInterceptor">
                 <!-- 请看verfiyCode详解 -->
                 <property name="verifyCode" value="false"></property>
                 <!-- 登录页地址 默认值"/login.html"-->
@@ -41,7 +41,7 @@ ublic class CustomValidator implements PasswordValidator {
         <!-- 权限验证拦截器 -->
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
-            <bean class="com.le.bigdata.auth.interceptor.PrivilegeInterceptor">
+            <bean class="PrivilegeInterceptor">
             </bean>
         </mvc:interceptor>
 </mvc:interceptors>
@@ -61,7 +61,7 @@ verfiyCode目的在于校验请求在传输过程中是否被篡改. true 启用
 # authorization 验证相关配置
 ##
 # 内置登录验证器 (此属性不要使用 已废弃 参照 password-validator.beanName)
-#password-validator.class = com.le.bigdata.auth.authentication.impl.OSSPasswordValidator
+#password-validator.class = OSSPasswordValidator
 ## 内置登录验证器(传递beanName 纳入spring ioc容器管理) 默认(内置le oss 登录)
 ## 如果用以上的password-validator 则值为 customValidator
 password-validator.beanName = passwordValidator 

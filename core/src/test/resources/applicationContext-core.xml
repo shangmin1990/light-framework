@@ -10,15 +10,15 @@
     <context:property-placeholder ignore-unresolvable="true" location="classpath:jedis.properties"/>
 
 
-    <bean class="com.le.bigdata.core.util.SpringContextUtils"/>
+    <bean class="net.shmin.core.util.SpringContextUtils"/>
 
     <!-- 需要将自己的包名加到这里边 例如 com.benjamin.project-->
     <context:component-scan base-package="
-    com.le.bigdata.core" use-default-filters="true">
+    net.shmin.core" use-default-filters="true">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
 
-    <bean class="com.le.bigdata.core.util.JedisPoolUtil">
+    <bean class="net.shmin.core.util.JedisPoolUtil">
         <property name="host" value="${host}"></property>
         <property name="port" value="${port}"></property>
         <property name="password" value="${password}"></property>
