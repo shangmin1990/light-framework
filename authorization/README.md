@@ -3,15 +3,15 @@
 ## maven
 ```xml
 <dependency>
-    <groupId>shmin.net</groupId>
+    <groupId>net.shmin</groupId>
     <artifactId>authorization</artifactId>
-    <version>1.3.1-SNAPSHOT</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 ## 实现PasswordValidator
 ```java
 @Compent("customValidator")
-ublic class CustomValidator implements PasswordValidator {
+public class CustomValidator implements PasswordValidator {
     public CommonResponseDTO login(HttpServletRequest request) throws Exception {
 
         String username = request.getParameter("username");
