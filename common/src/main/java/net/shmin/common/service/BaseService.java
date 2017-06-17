@@ -1,7 +1,9 @@
 package net.shmin.common.service;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import net.shmin.common.dao.BaseMapper;
+import net.shmin.core.exception.BusinessServiceException;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ public abstract class BaseService<ID extends Comparable<ID>, MODEL> implements I
     protected BaseMapper<MODEL> MAPPER;
 
     @Override
-    public MODEL findById(ID id) {
+    public MODEL selectById(ID id) {
         return MAPPER.selectByPrimaryKey(id);
     }
 
@@ -34,10 +36,11 @@ public abstract class BaseService<ID extends Comparable<ID>, MODEL> implements I
     }
 
     @Override
-    public List<MODEL> selectAllPage(RowBounds rowBounds) {
-        PageHelper.startPage(rowBounds.getOffset(), rowBounds.getLimit());
+    public Page<MODEL> selectAllPage(int page, int size) {
+        PageHelper.startPage(page, size);
         List<MODEL> models = MAPPER.selectAll();
-        return models;
+        Page<MODEL> pages = (Page<MODEL>) models;
+        return pages;
     }
 
     @Override
@@ -71,5 +74,34 @@ public abstract class BaseService<ID extends Comparable<ID>, MODEL> implements I
 
     public boolean updateByCondition(MODEL record, Example example){
         return MAPPER.updateByExampleSelective(record, example) > 0;
+    }
+
+    @Override
+    public MODEL selectOneByCondition(Example example) throws Exception {
+        List<MODEL> models = MAPPER.selectByExample(example);
+        if(models == null || models.size() == 0){
+            return null;
+        }
+        if(models.size() > 1){
+            throw new Exception("查询出了多条数据");
+        }
+        return models.get(0);
+    }
+
+    @Override
+    public long selectCount(MODEL model) {
+        return MAPPER.selectCount(model);
+    }
+
+    @Override
+    public long selectCountByCondition(Example example) {
+        return MAPPER.selectCountByExample(example);
+    }
+
+    @Override
+    public Page<MODEL> selectByConditionPage(Example example, int page, int size) {
+        PageHelper.startPage(page, size);
+        List<MODEL> list = MAPPER.selectByExample(example);
+        return (Page<MODEL>) list;
     }
 }

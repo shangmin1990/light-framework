@@ -53,13 +53,14 @@ public interface IBaseService<ID extends Comparable<ID>, MODEL> {
      */
     List<MODEL> selectAll();
 
+    
     /**
      * 分页获取
-     *
-     * @param rowBounds
-     * @return
+     * @param page
+     * @param size
+     * @return 
      */
-    List<MODEL> selectAllPage(RowBounds rowBounds);
+    List<MODEL> selectAllPage(int page, int size);
 
     /**
      * 插入一条数据
@@ -99,6 +100,13 @@ public interface IBaseService<ID extends Comparable<ID>, MODEL> {
      * @return
      */
     List<MODEL> selectByCondition(Example example);
+    
+    /**
+     * 通过通用条件查询 结果唯一
+     * @param example
+     * @return
+     */
+    MODEL selectOneByCondition(Example example) throws Exception;
 
     /**
      * 通过通用条件删除
@@ -114,6 +122,29 @@ public interface IBaseService<ID extends Comparable<ID>, MODEL> {
      * @return
      */
     boolean updateByCondition(MODEL record, Example example);
+    
+    /**
+     * 查询条数
+     * @param model
+     * @return
+     */
+    long selectCount(MODEL model);
+    
+    /**
+     * 根据条件查询条数
+     * @param example
+     * @return
+     */
+    long selectCountByCondition(Example example);
+    
+    /**
+     * 根据条件查询并分页
+     * @param example
+     * @param page
+     * @param size
+     * @return
+     */
+    Page<MODEL> selectByConditionPage(Example example, int page, int size);
 }
 ```
 ## 通用异常处理

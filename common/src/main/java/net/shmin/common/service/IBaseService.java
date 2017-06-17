@@ -1,5 +1,7 @@
 package net.shmin.common.service;
 
+import com.github.pagehelper.Page;
+import net.shmin.core.dto.CommonPageDTO;
 import org.apache.ibatis.session.RowBounds;
 import tk.mybatis.mapper.entity.Example;
 
@@ -17,7 +19,7 @@ public interface IBaseService<ID extends Comparable<ID>, MODEL> {
      * @param id
      * @return MODEL
      */
-    MODEL findById(ID id);
+    MODEL selectById(ID id);
 
     /**
      * 获取所有的数据
@@ -29,10 +31,11 @@ public interface IBaseService<ID extends Comparable<ID>, MODEL> {
     /**
      * 分页获取
      *
-     * @param rowBounds
+     * @param page 页码
+     * @param size 每页条数
      * @return
      */
-    List<MODEL> selectAllPage(RowBounds rowBounds);
+    Page<MODEL> selectAllPage(int page, int size);
 
     /**
      * 插入一条数据
@@ -74,6 +77,13 @@ public interface IBaseService<ID extends Comparable<ID>, MODEL> {
     List<MODEL> selectByCondition(Example example);
 
     /**
+     * 通过通用条件查询
+     * @param example
+     * @return
+     */
+    MODEL selectOneByCondition(Example example) throws Exception;
+
+    /**
      * 通过通用条件删除
      * @param example
      * @return
@@ -87,4 +97,27 @@ public interface IBaseService<ID extends Comparable<ID>, MODEL> {
      * @return
      */
     boolean updateByCondition(MODEL record, Example example);
+
+    /**
+     * 查询条数
+     * @param model
+     * @return
+     */
+    long selectCount(MODEL model);
+
+    /**
+     * 根据条件查询条数
+     * @param example
+     * @return
+     */
+    long selectCountByCondition(Example example);
+
+    /**
+     * 根据条件查询并分页
+     * @param example
+     * @param page
+     * @param size
+     * @return
+     */
+    Page<MODEL> selectByConditionPage(Example example, int page, int size);
 }
