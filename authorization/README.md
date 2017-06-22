@@ -5,7 +5,7 @@
 <dependency>
     <groupId>net.shmin</groupId>
     <artifactId>authorization</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0-SNAPSHOT</version>
 </dependency>
 ```
 ## 实现PasswordValidator
@@ -54,6 +54,51 @@ verfiyCode目的在于校验请求在传输过程中是否被篡改. true 启用
 * 3.将签名值放入Request Header中, 键为Verify-Code 值为第二步中的md5签名值.
 
 对于无参数的请求将不传递Verify-Code值.
+
+## 权限验证
+```java
+@org.springframework.web.bind.annotation.RestController
+@org.springframework.web.bind.annotation.RequestMapping("a")
+public class AController {
+    @org.springframework.web.bind.annotation.RequestMapping("b")
+    @net.shmin.auth.permission.Privilege(resourceId = 1, needed = {net.shmin.auth.permission.model.ACLEnum.CREATE}, profile = "dev")
+    public CommonResponseDTO login(HttpServletRequest request) throws Exception {
+
+        String username = request.getParameter("username");
+        //TODO your login logic
+        return CommonResponseDTO.success();
+    }
+}
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface Privilege {
+
+    /**
+     * 要访问的资源id
+     *
+     * @return
+     */
+    String[] resourceId();
+
+    /**
+     * 执行检查权限检查的类名
+     */
+    Class<? extends IPermissionValidator> permissionValidator() default LebiPermissionManagerImpl.class;
+
+    /**
+     * 访问该资源应该具有什么权限
+     */
+    ACLEnum[] needed();
+
+    /**
+     * 属于哪个环境下
+     * @return
+     */
+    String profile();
+
+}
+```
 
 ## authorization 验证相关配置
 ```java

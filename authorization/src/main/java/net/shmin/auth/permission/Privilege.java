@@ -33,4 +33,10 @@ public @interface Privilege {
      */
     ACLEnum[] needed();
 
+    /**
+     * 属于哪个环境下
+     * @return
+     */
+    String profile();
+
 }

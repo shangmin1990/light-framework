@@ -5,7 +5,7 @@
 <dependency>
     <groupId>net.shmin</groupId>
     <artifactId>common</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0-SNAPSHOT</version>
 </dependency>
 ```
 ## 通用Service
