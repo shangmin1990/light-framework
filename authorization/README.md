@@ -56,6 +56,7 @@ verfiyCode目的在于校验请求在传输过程中是否被篡改. true 启用
 对于无参数的请求将不传递Verify-Code值.
 
 ## 权限验证
+### 如何使用
 ```java
 @org.springframework.web.bind.annotation.RestController
 @org.springframework.web.bind.annotation.RequestMapping("a")
@@ -69,7 +70,9 @@ public class AController {
         return CommonResponseDTO.success();
     }
 }
-
+```
+### 注解信息
+```java
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface Privilege {
@@ -92,7 +95,7 @@ public @interface Privilege {
     ACLEnum[] needed();
 
     /**
-     * 属于哪个环境下
+     * 属于哪个环境下(不同环境中的id可能不一样)
      * @return
      */
     String profile();

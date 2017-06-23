@@ -29,6 +29,12 @@ public class ExampleServiceImpl extends BaseService<Integer, ExampleModel> imple
     }
 }
 ```
+## 定义Mapper
+```java
+public interface ExampleMapper extends net.shmin.common.dao.BaseMapper<ExampleModel> {
+    List<ExampleModel> customQuery(@org.apache.ibatis.annotations.Param("name") String name);
+}
+```
 
 ## 通用Service里的方法
 ```java
