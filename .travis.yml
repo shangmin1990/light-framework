@@ -1,13 +1,12 @@
 language: java
-jdk:
-- oraclejdk7
-script: mvn clean package
-install: mvn clean install
+script: mvn clean
 cache:
   directories:
     - ~/.m2/repository
 
 after_success:
+  - chmod a+x ./travis/before-deploy.sh
+  - chmod a+x ./travis/deploy.sh
   - ./travis/before-deploy.sh
   - ./travis/deploy.sh
 env:
