@@ -5,7 +5,7 @@
 <dependency>
     <groupId>net.shmin</groupId>
     <artifactId>core</artifactId>
-    <version>2.1.0-SNAPSHOT</version>
+    <version>2.1.0-RELEASE</version>
 </dependency>
 ```
 ## 缓存模块
