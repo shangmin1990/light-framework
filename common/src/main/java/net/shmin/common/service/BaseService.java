@@ -44,13 +44,22 @@ public abstract class BaseService<ID extends Comparable<ID>, MODEL> implements I
     }
 
     @Override
+    public boolean insertSelective(MODEL model) {
+        return MAPPER.insertSelective(model) == 1;
+    }
+
+    @Override
     public boolean insert(MODEL model) {
-        int count = MAPPER.insertSelective(model);
-        return count == 1;
+        return MAPPER.insert(model) == 1;
     }
 
     @Override
     public boolean update(MODEL model) {
+        return MAPPER.updateByPrimaryKey(model) == 1;
+    }
+
+    @Override
+    public boolean updateSelective(MODEL model) {
         return MAPPER.updateByPrimaryKeySelective(model) == 1;
     }
 

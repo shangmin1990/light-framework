@@ -48,7 +48,7 @@ public class ControllerAspect implements Constant {
             if(e instanceof BusinessServiceException){
                 BusinessServiceException ex = (BusinessServiceException) e;
                 errorCode = ex.getCode();
-                response.setStatus(errorCode);
+//                response.setStatus(errorCode);
             } else {
                 // 其他错误一律是500
                 response.setStatus(errorCode);

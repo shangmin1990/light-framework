@@ -39,6 +39,7 @@ public interface IBaseService<ID extends Comparable<ID>, MODEL> {
 
     /**
      * 插入一条数据
+     * null数据会保存
      *
      * @param model
      * @return true 插入成功, 插入失败
@@ -46,9 +47,26 @@ public interface IBaseService<ID extends Comparable<ID>, MODEL> {
     boolean insert(MODEL model);
 
     /**
+     * 插入一条数据
+     * null 数据不保存
+     *
+     * @param model
+     * @return true 插入成功, 插入失败
+     */
+    boolean insertSelective(MODEL model);
+
+    /**
      * 更新一条数据
      *
      * @param model 如果字段为null 则不更新
+     * @return 更新成功或失败
+     */
+    boolean updateSelective(MODEL model);
+
+    /**
+     * 更新一条数据
+     *
+     * @param model 如果字段为null也会更新
      * @return 更新成功或失败
      */
     boolean update(MODEL model);

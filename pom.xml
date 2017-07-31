@@ -52,7 +52,7 @@
             scm:git:https://github.com/shangmin1990/light-framework.git
         </developerConnection>
         <url>https://github.com/shangmin1990/light-framework</url>
-        <tag>v2.0.0-SNAPSHOT</tag>
+        <tag>v2.1.0-SNAPSHOT</tag>
     </scm>
 
     <dependencies>
