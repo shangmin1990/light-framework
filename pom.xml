@@ -15,7 +15,7 @@
     <groupId>net.shmin</groupId>
     <artifactId>light-framework</artifactId>
     <packaging>pom</packaging>
-    <version>2.1.0-RELEASE</version>
+    <version>2.1.1-RELEASE</version>
     <modules>
         <module>authorization</module>
         <module>core</module>

@@ -5,6 +5,7 @@ import net.shmin.core.dto.CommonPageDTO;
 import org.apache.ibatis.session.RowBounds;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -60,24 +61,38 @@ public interface IBaseService<ID extends Comparable<ID>, MODEL> {
      *
      * @param model 如果字段为null 则不更新
      * @return 更新成功或失败
+     * @see #updateByPrimaryKeySelective
      */
+    @Deprecated
     boolean updateSelective(MODEL model);
+
+    /**
+     * 更新一条数据(通过主键)
+     *
+     * @param model 如果字段为null 则不更新
+     * @return 更新成功或失败
+     */
+    boolean updateByPrimaryKeySelective(MODEL model);
 
     /**
      * 更新一条数据
      *
      * @param model 如果字段为null也会更新
      * @return 更新成功或失败
+     * @see #updateByPrimaryKey
      */
+    @Deprecated
     boolean update(MODEL model);
 
     /**
-     * 批量插入
+     * 更新一条数据(通过主键)
      *
-     * @param models
-     * @return 成功的行数
+     * @param model 如果字段为null 则不更新
+     * @return 更新成功或失败
+     *
      */
-    int insertBatch(List<MODEL> models);
+    boolean updateByPrimaryKey(MODEL model);
+
 
     /**
      * 删除一条数据
@@ -138,4 +153,36 @@ public interface IBaseService<ID extends Comparable<ID>, MODEL> {
      * @return
      */
     Page<MODEL> selectByConditionPage(Example example, int page, int size);
+
+    /**
+     * 批量插入
+     *
+     * @param models
+     * @return 成功的行数
+     */
+    int insertBatch(List<MODEL> models);
+
+    /**
+     * 批量插入
+     *
+     * @param models
+     * @return 成功的行数
+     */
+    int updateBatchByPrimaryKey(List<MODEL> models);
+
+    /**
+     * 批量插入
+     *
+     * @param models
+     * @return 成功的行数
+     */
+    int updateBatchByPrimaryKeySelective(List<MODEL> models);
+
+    /**
+     * 批量插入
+     *
+     * @param ids
+     * @return 成功的行数
+     */
+    int deleteBatchByPrimaryKey(List<ID> ids);
 }

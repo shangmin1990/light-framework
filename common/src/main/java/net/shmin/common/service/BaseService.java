@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -53,19 +54,25 @@ public abstract class BaseService<ID extends Comparable<ID>, MODEL> implements I
         return MAPPER.insert(model) == 1;
     }
 
+
+    /**
+     * Use updateByPrimaryKey instead.
+     * @see #updateByPrimaryKey(Object)
+     */
     @Override
+    @Deprecated
     public boolean update(MODEL model) {
         return MAPPER.updateByPrimaryKey(model) == 1;
     }
 
+    /**
+     * Use updateByPrimaryKeySelective instead.
+     * @see #updateByPrimaryKeySelective(Object)
+     */
     @Override
+    @Deprecated
     public boolean updateSelective(MODEL model) {
         return MAPPER.updateByPrimaryKeySelective(model) == 1;
-    }
-
-    @Override
-    public int insertBatch(List<MODEL> models) {
-        return MAPPER.insertList(models);
     }
 
     @Override
@@ -112,5 +119,47 @@ public abstract class BaseService<ID extends Comparable<ID>, MODEL> implements I
         PageHelper.startPage(page, size);
         List<MODEL> list = MAPPER.selectByExample(example);
         return (Page<MODEL>) list;
+    }
+
+    @Override
+    public int insertBatch(List<MODEL> models) {
+        return MAPPER.insertList(models);
+    }
+
+    @Override
+    public int updateBatchByPrimaryKey(List<MODEL> models) {
+        int count = 0;
+        for (MODEL model: models){
+            count += MAPPER.updateByPrimaryKey(model);
+        }
+        return count;
+    }
+
+    @Override
+    public int deleteBatchByPrimaryKey(List<ID> ids) {
+        int count = 0;
+        for (ID id: ids){
+            count += MAPPER.deleteByPrimaryKey(id);
+        }
+        return count;
+    }
+
+    @Override
+    public boolean updateByPrimaryKeySelective(MODEL model) {
+        return MAPPER.updateByPrimaryKeySelective(model)== 1;
+    }
+
+    @Override
+    public boolean updateByPrimaryKey(MODEL model) {
+        return MAPPER.updateByPrimaryKey(model) == 1;
+    }
+
+    @Override
+    public int updateBatchByPrimaryKeySelective(List<MODEL> models) {
+        int count = 0;
+        for (MODEL model: models){
+            count += MAPPER.updateByPrimaryKeySelective(model);
+        }
+        return count;
     }
 }
