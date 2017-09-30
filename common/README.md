@@ -5,7 +5,7 @@
 <dependency>
     <groupId>net.shmin</groupId>
     <artifactId>common</artifactId>
-    <version>2.1.0-RELEASE</version>
+    <version>2.2.0-RELEASE</version>
 </dependency>
 ```
 ## 通用Service
@@ -45,112 +45,176 @@ public interface ExampleMapper extends net.shmin.common.dao.BaseMapper<ExampleMo
 public interface IBaseService<ID extends Comparable<ID>, MODEL> {
 
     /**
-     * 根据主键获取MODEL
-     *
-     * @param id
-     * @return MODEL
-     */
-    MODEL findById(ID id);
-
-    /**
-     * 获取所有的数据
-     *
-     * @return 所有数据库中的数据
-     */
-    List<MODEL> selectAll();
-
+         * 根据主键获取MODEL
+         *
+         * @param id
+         * @return MODEL
+         */
+        MODEL selectById(ID id);
     
-    /**
-     * 分页获取
-     * @param page
-     * @param size
-     * @return 
-     */
-    List<MODEL> selectAllPage(int page, int size);
-
-    /**
-     * 插入一条数据
-     *
-     * @param model
-     * @return true 插入成功, 插入失败
-     */
-    boolean insert(MODEL model);
-
-    /**
-     * 更新一条数据
-     *
-     * @param model 如果字段为null 则不更新
-     * @return 更新成功或失败
-     */
-    boolean update(MODEL model);
-
-    /**
-     * 批量插入
-     *
-     * @param models
-     * @return 成功的行数
-     */
-    int insertBatch(List<MODEL> models);
-
-    /**
-     * 删除一条数据
-     *
-     * @param id 主键
-     * @return true 删除成功, false删除失败
-     */
-    boolean deleteByPrimaryKey(ID id);
-
-    /**
-     * 通过通用条件查询
-     * @param example
-     * @return
-     */
-    List<MODEL> selectByCondition(Example example);
+        /**
+         * 获取所有的数据
+         *
+         * @return 所有数据库中的数据
+         */
+        List<MODEL> selectAll();
     
-    /**
-     * 通过通用条件查询 结果唯一
-     * @param example
-     * @return
-     */
-    MODEL selectOneByCondition(Example example) throws Exception;
-
-    /**
-     * 通过通用条件删除
-     * @param example
-     * @return
-     */
-    boolean deleteByCondition(Example example);
-
-    /**
-     * 通过通用条件更新
-     * @param record
-     * @param example
-     * @return
-     */
-    boolean updateByCondition(MODEL record, Example example);
+        /**
+         * 分页获取
+         *
+         * @param page 页码
+         * @param size 每页条数
+         * @return
+         */
+        Page<MODEL> selectAllPage(int page, int size);
     
-    /**
-     * 查询条数
-     * @param model
-     * @return
-     */
-    long selectCount(MODEL model);
+        /**
+         * 插入一条数据
+         * null数据会保存
+         *
+         * @param model
+         * @return true 插入成功, 插入失败
+         */
+        boolean insert(MODEL model);
     
-    /**
-     * 根据条件查询条数
-     * @param example
-     * @return
-     */
-    long selectCountByCondition(Example example);
+        /**
+         * 插入一条数据
+         * null 数据不保存
+         *
+         * @param model
+         * @return true 插入成功, 插入失败
+         */
+        boolean insertSelective(MODEL model);
     
-    /**
-     * 根据条件查询并分页
-     * @param example
-     * @param page
-     * @param size
-     * @return
-     */
-    Page<MODEL> selectByConditionPage(Example example, int page, int size);
+        /**
+         * 更新一条数据
+         *
+         * @param model 如果字段为null 则不更新
+         * @return 更新成功或失败
+         * @see #updateByPrimaryKeySelective
+         */
+        @Deprecated
+        boolean updateSelective(MODEL model);
+    
+        /**
+         * 更新一条数据(通过主键)
+         *
+         * @param model 如果字段为null 则不更新
+         * @return 更新成功或失败
+         */
+        boolean updateByPrimaryKeySelective(MODEL model);
+    
+        /**
+         * 更新一条数据
+         *
+         * @param model 如果字段为null也会更新
+         * @return 更新成功或失败
+         * @see #updateByPrimaryKey
+         */
+        @Deprecated
+        boolean update(MODEL model);
+    
+        /**
+         * 更新一条数据(通过主键)
+         *
+         * @param model 如果字段为null 则不更新
+         * @return 更新成功或失败
+         *
+         */
+        boolean updateByPrimaryKey(MODEL model);
+    
+    
+        /**
+         * 删除一条数据
+         *
+         * @param id 主键
+         * @return true 删除成功, false删除失败
+         */
+        boolean deleteByPrimaryKey(ID id);
+    
+        /**
+         * 通过通用条件查询
+         * @param example
+         * @return
+         */
+        List<MODEL> selectByCondition(Example example);
+    
+        /**
+         * 通过通用条件查询
+         * @param example
+         * @return
+         */
+        MODEL selectOneByCondition(Example example) throws Exception;
+    
+        /**
+         * 通过通用条件删除
+         * @param example
+         * @return
+         */
+        boolean deleteByCondition(Example example);
+    
+        /**
+         * 通过通用条件更新
+         * @param record
+         * @param example
+         * @return
+         */
+        boolean updateByCondition(MODEL record, Example example);
+    
+        /**
+         * 查询条数
+         * @param model
+         * @return
+         */
+        long selectCount(MODEL model);
+    
+        /**
+         * 根据条件查询条数
+         * @param example
+         * @return
+         */
+        long selectCountByCondition(Example example);
+    
+        /**
+         * 根据条件查询并分页
+         * @param example
+         * @param page
+         * @param size
+         * @return
+         */
+        Page<MODEL> selectByConditionPage(Example example, int page, int size);
+    
+        /**
+         * 批量插入
+         *
+         * @param models
+         * @return 成功的行数
+         */
+        int insertBatch(List<MODEL> models);
+    
+        /**
+         * 批量插入
+         *
+         * @param models
+         * @return 成功的行数
+         */
+        int updateBatchByPrimaryKey(List<MODEL> models);
+    
+        /**
+         * 批量插入
+         *
+         * @param models
+         * @return 成功的行数
+         */
+        int updateBatchByPrimaryKeySelective(List<MODEL> models);
+    
+        /**
+         * 批量插入
+         *
+         * @param ids
+         * @return 成功的行数
+         */
+        int deleteBatchByPrimaryKey(List<ID> ids);
 }
 ```
 ## 通用异常处理

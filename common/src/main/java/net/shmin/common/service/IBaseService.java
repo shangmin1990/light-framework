@@ -1,11 +1,8 @@
 package net.shmin.common.service;
 
 import com.github.pagehelper.Page;
-import net.shmin.core.dto.CommonPageDTO;
-import org.apache.ibatis.session.RowBounds;
 import tk.mybatis.mapper.entity.Example;
 
-import java.util.Collection;
 import java.util.List;
 
 /**

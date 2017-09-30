@@ -14,9 +14,9 @@ public interface IAuthTokenGenerator {
     /**
      * 生成访问令牌
      *
-     * @param userRefreshToken 是否生成刷新令牌
+     * @param withRefreshToken 是否生成刷新令牌
      * @return
      */
-    Token generateAccessToken(boolean userRefreshToken);
+    Token generateAccessToken(boolean withRefreshToken);
 
 }

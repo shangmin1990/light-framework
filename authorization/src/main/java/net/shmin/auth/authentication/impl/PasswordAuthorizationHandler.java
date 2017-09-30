@@ -1,5 +1,7 @@
 package net.shmin.auth.authentication.impl;
 
+import net.shmin.auth.event.LoginFailureEvent;
+import net.shmin.auth.event.LoginSuccessEvent;
 import net.shmin.auth.token.Token;
 import net.shmin.auth.token.TokenType;
 import net.shmin.auth.util.WebUtil;
@@ -24,20 +26,23 @@ public class PasswordAuthorizationHandler extends GrantTypeAuthorizationHandlerA
         String username = request.getParameter(requestParamUsername);
         // 登录成功
         if (result) {
+
             // access_token
-            String tokenValue = getTokenProvider().getToken(username, TokenType.accessToken);
             // 每一次登录都要换一个新的token
             // 用户名密码模式不需要refresh_token
             Token token = getAuthTokenGenerator().generateAccessToken(false);
-            if (tokenValue != null && !tokenValue.isEmpty()) {
-                token.setValue(tokenValue);
-            }
-            getTokenProvider().saveToken(username, token);
+
+            getTokenProvider().saveToken(token);
+
+            LoginSuccessEvent loginSuccessEvent = new LoginSuccessEvent(this, authContext, request, response, commonResponseDTO.getData(), token);
+            loginListenerManager.fireEvent(loginSuccessEvent);
 
             setLoginSuccessCookies(request, response, token, username);
 
             WebUtil.response(request, response, token, access_token_cookie_name, username_cookie_name, commonResponseDTO.getData());
         } else {
+            LoginFailureEvent loginFailureEvent = new LoginFailureEvent(this, authContext, request, response, commonResponseDTO.getData());
+            loginListenerManager.fireEvent(loginFailureEvent);
             try {
                 WebUtil.replyNoAccess(request, response, commonResponseDTO.toString());
             } catch (Exception e) {

@@ -1,10 +1,15 @@
 package net.shmin.auth.token.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import net.shmin.auth.AuthContext;
 import net.shmin.auth.token.IAuthTokenGenerator;
 import net.shmin.auth.token.IAuthTokenProvider;
 import net.shmin.auth.token.Token;
-import net.shmin.auth.token.impl.RedisTokenProvider;
+import net.shmin.auth.token.TokenType;
+import net.shmin.core.util.SerializationUtil;
+import org.apache.commons.codec.binary.Base64;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +17,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Created by benjamin on 2017/3/28.
@@ -23,8 +29,16 @@ public class SimpleTokenGeneratorImplTest {
     @Autowired
     private IAuthTokenGenerator authTokenGenerator;
 
-    @Resource(name = "redisTokenProvider")
-    private IAuthTokenProvider tokenProvider;
+    @Autowired
+    private AuthContext authContext;
+
+    private Token token;
+
+    @Before
+    public void before(){
+        token = authTokenGenerator.generateAccessToken(true);
+    }
+
 
     /**
      * 测试设置token有效期是否生效
@@ -39,17 +53,49 @@ public class SimpleTokenGeneratorImplTest {
         Assert.assertTrue(expires == 60 * 1000L);
         Assert.assertTrue(code.getExpires() == 10 * 60 * 1000L);
         Assert.assertTrue(token.getRefreshToken().getExpires() == 30 * 24 * 3600 * 1000L);
+        Assert.assertTrue(authContext.getAccessTokenRedisDatabase() == 1);
+        Assert.assertTrue(authContext.getRefreshTokenRedisDatabase() == 3);
+        Assert.assertTrue(authContext.getAuthorizationCodeRedisDatabase() == 2);
+        Assert.assertTrue(authContext.getTokenKeyPrefix().equals(""));
+        Assert.assertTrue(authContext.getAccessTokenKeySuffix().equals("_ACCESS_TOKEN"));
+    }
 
-//        tokenProvider.saveToken("a", token);
 
-//        boolean result = tokenProvider.checkToken("a", token);
+    @Test
+    public void testSaveToken(){
 
-        RedisTokenProvider redisTokenProvider = (RedisTokenProvider) tokenProvider;
-        Assert.assertTrue(redisTokenProvider.getACCESS_TOKEN_STORAGE() == 1);
-        Assert.assertTrue(redisTokenProvider.getREFRESH_TOKEN_STORAGE() == 3);
-        Assert.assertTrue(redisTokenProvider.getAUTHORIZATION_CODE_STORAGE() == 2);
-        Assert.assertTrue(redisTokenProvider.getTOKEN_PREFIX().equals(""));
-        Assert.assertTrue(redisTokenProvider.getACCESS_TOKEN_SUFFIX().equals("_ACCESS_TOKEN"));
-//        Assert.assertTrue(result);
+        authContext.getAuthTokenProvider().saveToken(token);
+
+        boolean result = authContext.getAuthTokenProvider().checkToken(token.getValue(), token.getTokenType());
+
+        Assert.assertTrue(result);
+
+        boolean result1 = authContext.getAuthTokenProvider().checkToken(token.getValue(), TokenType.refreshToken);
+
+        Assert.assertTrue(!result1);
+
+        boolean result2 = authContext.getAuthTokenProvider().checkToken(token.getValue(), TokenType.authorizationCode);
+
+        Assert.assertTrue(!result2);
+    }
+
+    @Test
+    public void testAttribute(){
+
+        Token token = authTokenGenerator.generateAccessToken(true);
+
+        authContext.getAuthTokenProvider().saveToken(token);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("name", "abc");
+        authContext.setAttribute(token.getValue(), "user", jsonObject);
+
+        JSONObject result = authContext.getAttribute(token.getValue(), "user", JSONObject.class);
+        Assert.assertTrue(result.equals(jsonObject));
+
+        authContext.removeAttribute(token.getValue(), "user");
+
+        JSONObject result1 = authContext.getAttribute(token.getValue(), "user", JSONObject.class);
+        Assert.assertTrue(result1 == null);
     }
 }

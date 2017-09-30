@@ -5,7 +5,7 @@
 <dependency>
     <groupId>net.shmin</groupId>
     <artifactId>authorization</artifactId>
-    <version>2.1.0-RELEASE</version>
+    <version>2.2.0-RELEASE</version>
 </dependency>
 ```
 ## 实现PasswordValidator
@@ -20,6 +20,35 @@ public class CustomValidator implements PasswordValidator {
     }
 }
 ```
+
+## 监听登录结果(成功或失败)
+### 允许用户在登录过程中放置自定义数据到session中.
+```java
+@org.springframework.stereotype.Component
+public class CustomLoginListener implements net.shmin.auth.event.LoginListener {
+    @Override
+    public void loginHandler(net.shmin.auth.event.LoginEvent loginEvent){
+        // LoginSuccessEvent | LoginFailureEvent 
+        if (event instanceof LoginSuccessEvent){
+             LoginSuccessEvent loginSuccessEvent = (LoginSuccessEvent) event;
+             // 此Data是login方法返回的CommonResponseDTO中的data
+             JSONObject data = (JSONObject) loginSuccessEvent.getData();
+             
+             AuthContext authContext = loginSuccessEvent.getAuthContext();
+             // 把user
+             if (data.containsKey(USER)){
+                 User user = JSON.parseObject(data.getJSONObject(USER).toJSONString(), User.class);
+                 Token token = loginSuccessEvent.getToken();
+                 authContext.setAttribute(token.getValue(), USER, user);
+             }
+         }
+    }
+}
+```
+
+## AuthContext
+* 与properties文件属性的映射, 查询配置信息
+* 提供便捷的操作方法 例如setAttribute和getAttribute
 
 ## 配置拦截器
 ```xml
@@ -108,19 +137,16 @@ public @interface Privilege {
 ##
 # authorization 验证相关配置
 ##
-# 内置登录验证器 (此属性不要使用 已废弃 参照 password-validator.beanName)
-#password-validator.class = OSSPasswordValidator
 ## 内置登录验证器(传递beanName 纳入spring ioc容器管理) 默认(内置le oss 登录)
-## 如果用以上的password-validator 则值为 customValidator
 password-validator.beanName = passwordValidator 
 
-# 单位分钟 (默认 7天) access-token有效期
+# 单位分钟 (默认 7天) access-token有效期 (1y, 1M, 1d, 1h, 1m, 1s, 1ms)
 access-token.expires =
 
-# 单位分钟 默认(10分钟) authorization-code有效期
+# 单位分钟 默认(10分钟) authorization-code有效期 (1y, 1M, 1d, 1h, 1m, 1s, 1ms)
 authorization-code.expires =
 
-# 单位分钟 默认(30天) refresh-token有效期
+# 单位分钟 默认(30天) refresh-token有效期 (1y, 1M, 1d, 1h, 1m, 1s, 1ms)
 refresh-token.expires =
 
 # 防止命名冲突 token的key的前缀 (默认为空) 
@@ -152,6 +178,10 @@ cookie.username.name = username
 
 # 登录请求request 中 username 的parameter name 默认为username
 request.authorize.param.username = username
+
+# 自定义token.provider beanName 
+# 默认的tokenProviderBeanName 是 redisTokenProviderImpl
+token.provider.beanName = myTokenProvider
 ```
 
 ## [Demo案例(light-framework-project)](https://github.com/shangmin1990/light-framework-project)

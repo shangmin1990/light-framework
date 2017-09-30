@@ -1,22 +1,19 @@
 package net.shmin.auth.authentication.impl;
 
+import net.shmin.auth.AuthContext;
 import net.shmin.auth.authentication.AuthorizationHandler;
 import net.shmin.auth.authentication.PasswordValidator;
 import net.shmin.auth.authentication.exception.NoGrantTypeFoundException;
+import net.shmin.auth.event.LoginListenerManager;
 import net.shmin.auth.token.GrantType;
 import net.shmin.auth.token.IAuthTokenGenerator;
 import net.shmin.auth.token.IAuthTokenProvider;
 import net.shmin.auth.token.Token;
 import net.shmin.core.Constant;
 import net.shmin.core.dto.CommonResponseDTO;
-import net.shmin.core.util.SpringContextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
@@ -29,39 +26,29 @@ import javax.servlet.http.HttpServletResponse;
  * 对应oauth种的四种授权方式
  * 隐式授权和客户端模式没有实现，请使用authorization_code授权码模式和密码模式
  */
-public abstract class AbstractAuthorizationHandler implements AuthorizationHandler, Constant {
+public abstract class AbstractAuthorizationHandler implements AuthorizationHandler, Constant{
 
-    @Deprecated
-    @Value("${password-validator.class}")
-    private String className;
+    @Autowired
+    protected AuthContext authContext;
 
-    @Value("${password-validator.beanName}")
-    private String beanName;
-
-    @Resource(name = "redisTokenProvider")
-    private IAuthTokenProvider tokenProvider;
+    protected IAuthTokenProvider tokenProvider;
 
     @Autowired
     private IAuthTokenGenerator authTokenGenerator;
 
     private PasswordValidator passwordValidator;
 
-    @Value("${request.authorize.param.username}")
+    @Autowired
+    protected LoginListenerManager loginListenerManager;
+
     protected String requestParamUsername;
 
     public PasswordValidator getPasswordValidator() {
         return passwordValidator;
     }
 
-    @Resource(name = "passwordValidator")
-    public void setPasswordValidator(PasswordValidator passwordValidator) {
-        this.passwordValidator = passwordValidator;
-    }
-
-    @Value("${cookie.access_token.name}")
     protected String access_token_cookie_name;
 
-    @Value("${cookie.username.name}")
     protected String username_cookie_name;
 
     public String getAccess_token_cookie_name() {
@@ -104,75 +91,14 @@ public abstract class AbstractAuthorizationHandler implements AuthorizationHandl
         this.authTokenGenerator = authTokenGenerator;
     }
 
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
     @PostConstruct
-    private void init() {
-        initPasswordValidatorByClassName();
-        initPasswordValidatorByBeanName();
-        initProperty();
-    }
+    private void init(){
+        tokenProvider = authContext.getAuthTokenProvider();
+        passwordValidator = authContext.getPasswordValidator();
+        requestParamUsername = authContext.getUsernameRequestParam();
+        access_token_cookie_name = authContext.getAccessTokenCookieName();
+        username_cookie_name  = authContext.getUsernameCookieName();
 
-    private void initProperty() {
-        if(access_token_cookie_name == null
-                || access_token_cookie_name.isEmpty()
-                || access_token_cookie_name.equals("${cookie.access_token.name}")){
-            access_token_cookie_name = "access_token";
-        }
-
-        if(username_cookie_name == null
-                || username_cookie_name.isEmpty()
-                || username_cookie_name.equals("${cookie.username.name}")){
-            username_cookie_name = "username";
-        }
-
-        if(requestParamUsername == null
-                || requestParamUsername.isEmpty()
-                || requestParamUsername.equals("${request.authorize.param.username}")){
-            requestParamUsername = "username";
-        }
-
-    }
-
-
-    /**
-     * 通过查找注册在spring ioc context中的bean name获取PasswordValidator实例
-     */
-    private void initPasswordValidatorByBeanName() {
-        if (beanName != null && !beanName.isEmpty() && !"${password-validator.beanName}".equals(beanName)) {
-            ApplicationContext context = SpringContextUtils.getApplicationContext();
-            PasswordValidator passwordValidator = context.getBean(beanName, PasswordValidator.class);
-            // 如果设置了错误的beanName 则报错!
-            Assert.notNull(passwordValidator);
-            this.passwordValidator = passwordValidator;
-        }
-    }
-
-    /**
-     * 通过反射创建PasswordValidator实例
-     */
-    @Deprecated
-    private void initPasswordValidatorByClassName() {
-        if (className != null && !className.isEmpty() && !"${password-validator.class}".equals(className)) {
-            try {
-                Class clazz = Class.forName(className);
-                Class<?>[] interfaces = clazz.getInterfaces();
-                for (Class clazz1 : interfaces) {
-                    if (clazz1.equals(PasswordValidator.class)) {
-                        PasswordValidator passwordValidator = (PasswordValidator) clazz.newInstance();
-                        this.passwordValidator = passwordValidator;
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     @Override

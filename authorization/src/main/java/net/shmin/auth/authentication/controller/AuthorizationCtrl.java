@@ -1,28 +1,32 @@
 package net.shmin.auth.authentication.controller;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import net.shmin.auth.AuthContext;
 import net.shmin.auth.authentication.AuthorizationHandler;
 import net.shmin.auth.token.IAuthTokenProvider;
 import net.shmin.auth.token.Token;
 import net.shmin.auth.token.TokenType;
+import net.shmin.auth.util.WebUtil;
 import net.shmin.core.dto.CommonResponseDTO;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import static net.shmin.core.Constant.ACCESS_TOKEN;
-import static net.shmin.core.Constant.USER_COOKIE_NAME;
 
 /**
  * 登录权限相关的ctrl
@@ -41,6 +45,9 @@ public class AuthorizationCtrl {
 
     @Resource(name = "authorizationCodeHandler")
     private AuthorizationHandler authorizationCode;
+
+    @Autowired
+    private AuthContext authContext;
 
     @PostConstruct
     public void init() {
@@ -82,17 +89,30 @@ public class AuthorizationCtrl {
     @RequestMapping(method = RequestMethod.GET, value = "revoke_token")
     @ApiOperation("登出接口")
     @ResponseBody
-    public CommonResponseDTO revokeToken(@ApiIgnore @CookieValue(ACCESS_TOKEN) String token) throws IOException {
-        tokenProvider.deleteToken(token, TokenType.accessToken);
+    public CommonResponseDTO revokeToken(@ApiIgnore HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String token = WebUtil.getCookieValue(request, authContext.getAccessTokenCookieName());
+        tokenProvider.removeToken(token, TokenType.accessToken);
+        Cookie cookie = new Cookie(authContext.getAccessTokenCookieName(), "");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        Cookie cookie1 = new Cookie(authContext.getUsernameCookieName(), "");
+        cookie1.setMaxAge(0);
+        response.addCookie(cookie1);
         return CommonResponseDTO.success();
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "refresh_token")
     @ApiOperation("通过refresh_token 获取新的token")
     @ResponseBody
-    public CommonResponseDTO refreshToken(@ApiIgnore @CookieValue(USER_COOKIE_NAME) String username,
+    public CommonResponseDTO refreshToken(@ApiIgnore HttpServletResponse response,
                                           @RequestParam("refresh_token") String refreshToken) throws IOException {
-        Token token = tokenProvider.newTokenFromRefreshToken(username, refreshToken);
+//        String username = WebUtil.getCookieValue(request, authContext.getUsernameCookieName());
+        Token token = tokenProvider.newTokenFromRefreshToken(refreshToken);
+        Cookie cookie = new Cookie(authContext.getAccessTokenCookieName(), token.getValue());
+        cookie.setMaxAge(0);
+        cookie.setMaxAge((int) token.getExpires() / 1000);
+        response.addCookie(cookie);
         return CommonResponseDTO.success(token);
     }
 }

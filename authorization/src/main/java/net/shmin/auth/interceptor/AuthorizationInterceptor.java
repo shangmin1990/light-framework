@@ -1,5 +1,6 @@
 package net.shmin.auth.interceptor;
 
+import net.shmin.auth.AuthContext;
 import net.shmin.auth.handler.IRequestHandler;
 import net.shmin.auth.token.IAuthTokenProvider;
 import net.shmin.auth.token.Token;
@@ -22,7 +23,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 
-    @Resource(name = "redisTokenProvider")
+    @Autowired
+    private AuthContext authContext;
+
     private IAuthTokenProvider tokenProvider;
 
     @Autowired
@@ -58,6 +61,8 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
             loginUrl = servletContext.getContextPath() + "/login.html";
         }
 
+        tokenProvider = authContext.getAuthTokenProvider();
+
         //servletContext.getContextPath();
     }
 
@@ -74,7 +79,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
                 || cookieTokenValue.isEmpty()
                 || username == null
                 || username.isEmpty()
-                || !tokenProvider.checkToken(username, token)) {
+                || !tokenProvider.checkToken(cookieTokenValue, TokenType.accessToken)) {
             if (WebUtil.isAjaxRequest(request)) {
                 WebUtil.reply(request, response, 401, "请先登录");
             } else {

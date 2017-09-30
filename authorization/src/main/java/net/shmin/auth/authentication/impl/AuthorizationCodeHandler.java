@@ -70,7 +70,7 @@ public class AuthorizationCodeHandler extends GrantTypeAuthorizationHandlerAdapt
             String state = request.getParameter(STATE);
             if (clientManager.checkClientId(clientId)) {
                 Token token = getAuthTokenGenerator().generateAccessToken(true);
-                getTokenProvider().saveToken(username, token);
+                getTokenProvider().saveToken(token);
 //        req.getRequestDispatcher("access_token?code="+token.getValue()+"&redirect_uri="+redirect_uri+"&state="+state+"&grant_type=authorization_code").forward(req, resp);
                 if (redirect_uri == null || redirect_uri.isEmpty()) {
                     redirect_uri = PropertiesUtil.getString(REDIRECT_URI);
@@ -112,15 +112,10 @@ public class AuthorizationCodeHandler extends GrantTypeAuthorizationHandlerAdapt
                         e.printStackTrace();
                     }
                 } else {
-                    Token token_code = new Token();
-                    token_code.setTokenType(TokenType.authorizationCode);
-                    if (username == null) {
-                        username = (String) request.getAttribute("user");
-                    }
-                    boolean result = getTokenProvider().checkToken(username, token_code);
+                    boolean result = getTokenProvider().checkToken(code, TokenType.authorizationCode);
                     if (result) {
                         Token token = getAuthTokenGenerator().generateAccessToken(false);
-                        getTokenProvider().saveToken(username, token);
+                        getTokenProvider().saveToken(token);
                         try {
                             response.sendRedirect(redirect_uri);
                         } catch (IOException e) {

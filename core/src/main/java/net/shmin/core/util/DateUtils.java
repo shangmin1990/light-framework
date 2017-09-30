@@ -74,4 +74,41 @@ public class DateUtils {
         }
         return simpleDateFormat.parse(date);
     }
+
+    public static long resolveMillionSeconds(String str){
+
+        if(str == null || str.isEmpty()){
+            return -1;
+        }
+
+        try{
+            long num = Long.parseLong(str);
+            return num;
+        } catch (NumberFormatException e){
+            if(str.endsWith("ms")){
+                return Long.parseLong(str.substring(0, str.length() - 2));
+            }
+            char end = str.charAt(str.length() - 1);
+
+            String numStr = str.substring(0, str.length() - 1);
+            long number = Long.parseLong(numStr);
+
+            switch (end){
+
+                case 'y':
+                    return number * 365 * 24 * 3600 * 1000;
+                case 'M':
+                    return number * 30 * 24 * 3600 * 1000;
+                case 'd':
+                    return number * 24 * 3600 * 1000;
+                case 'h':
+                    return number * 3600 * 1000;
+                case 'm':
+                    return number * 60 * 1000;
+                case 's':
+                    return number * 1000;
+            }
+        }
+        return -1;
+    }
 }

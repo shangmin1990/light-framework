@@ -7,43 +7,58 @@ public interface IAuthTokenProvider {
 
     /**
      * 检查token的合法性
-     *
-     * @param key
      * @param token
      * @return
      */
-    boolean checkToken(String key, Token token);
+    boolean checkToken(String token, TokenType tokenType);
 
     /**
      * 保存一个Token
      *
      * @param key
-     * @param token
      */
-    void saveToken(String key, Token token);
+    void saveToken(Token key);
 
     /**
-     * 通过key获取一个token的值
+     * 获取一个属性值
      *
-     * @param key
+     * @param token
+     * @param attr
      * @return
      */
-    String getToken(String key, TokenType tokenType);
+    public <T> T getAttribute(String token, String attr, Class<T> tClass);
+
+    /**
+     * 设置一个属性值
+     *
+     * @param token
+     * @param attr
+     * @return
+     */
+    <T> void setAttribute(String token, String attr, T value);
+
+    /**
+     * 删除一个属性值
+     *
+     * @param token
+     * @param attr
+     * @return
+     */
+    void removeAttribute(String token, String attr);
 
     /**
      * 通过refreshToken获取 新的Token
-     * @param key
-     * @param refreshTokenValue
+     * @param refreshToken
      * @return
      */
-    Token newTokenFromRefreshToken(String key, String refreshTokenValue);
+    Token newTokenFromRefreshToken(String refreshToken);
 
     /**
      * 删除一个Token
      *
      * @param key
      */
-    void deleteToken(String key, TokenType tokenType);
+    void removeToken(String key, TokenType tokenType);
 
     /**
      * 销毁方法
