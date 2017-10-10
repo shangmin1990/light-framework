@@ -55,7 +55,7 @@ public class SimpleTokenGeneratorImplTest {
     }
 
 
-    @Test
+//    @Test
     public void testSaveToken(){
 
         authContext.getAuthTokenProvider().saveToken(token);
@@ -73,7 +73,7 @@ public class SimpleTokenGeneratorImplTest {
         Assert.assertTrue(!result2);
     }
 
-    @Test
+//    @Test
     public void testAttribute(){
 
         Token token = authTokenGenerator.generateAccessToken(true);
