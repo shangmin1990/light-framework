@@ -1,8 +1,5 @@
 package net.shmin.auth.authentication.controller;
 
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import net.shmin.auth.AuthContext;
 import net.shmin.auth.authentication.AuthorizationHandler;
 import net.shmin.auth.token.IAuthTokenProvider;
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -63,14 +59,15 @@ public class AuthorizationCtrl {
         this.tokenProvider = tokenProvider;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "authorize")
-    @ApiOperation(value = "登录接口(OAuth2.0认证 实现了 grant_type=password 和 grant_type=code的认证方式)",
-    notes = "username是必传参数, 理论上来讲可以灵活的传递其他参数, 但默认的只需要传递 username, password, grant_type即可")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "username", dataType = "string",value = "用户名", paramType = "form"),
-            @ApiImplicitParam(name = "password", dataType = "string", value = "密码", paramType = "form"),
-            @ApiImplicitParam(name = "grant_type", dataType = "string", value = "用户名", defaultValue = "password", allowableValues = "password", paramType = "form")
-    })
+
+    @RequestMapping(method = RequestMethod.POST, value = AuthContext.REQUEST_AUTHORIZE_PATH_REG)
+//    @ApiOperation(value = "登录接口(OAuth2.0认证 实现了 grant_type=password 和 grant_type=code的认证方式)",
+//    notes = "username是必传参数, 理论上来讲可以灵活的传递其他参数, 但默认的只需要传递 username, password, grant_type即可")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "username", dataType = "string",value = "用户名", paramType = "form"),
+//            @ApiImplicitParam(name = "password", dataType = "string", value = "密码", paramType = "form"),
+//            @ApiImplicitParam(name = "grant_type", dataType = "string", value = "用户名", defaultValue = "password", allowableValues = "password", paramType = "form")
+//    })
     public void authorize(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             for (AuthorizationHandler authorizationHandler : authorizationHandlers) {
@@ -86,10 +83,10 @@ public class AuthorizationCtrl {
         }
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "revoke_token")
-    @ApiOperation("登出接口")
+    @RequestMapping(method = RequestMethod.GET, value = AuthContext.REQUEST_LOGOUT_PATH_REG)
+////    @ApiOperation("登出接口")
     @ResponseBody
-    public CommonResponseDTO revokeToken(@ApiIgnore HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public CommonResponseDTO revokeToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String token = WebUtil.getCookieValue(request, authContext.getAccessTokenCookieName());
         tokenProvider.removeToken(token, TokenType.accessToken);
         Cookie cookie = new Cookie(authContext.getAccessTokenCookieName(), "");
@@ -102,10 +99,10 @@ public class AuthorizationCtrl {
         return CommonResponseDTO.success();
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "refresh_token")
-    @ApiOperation("通过refresh_token 获取新的token")
+    @RequestMapping(method = RequestMethod.GET, value = AuthContext.REQUEST_REFRESH_TOKEN_PATH_REG)
+////    @ApiOperation("通过refresh_token 获取新的token")
     @ResponseBody
-    public CommonResponseDTO refreshToken(@ApiIgnore HttpServletResponse response,
+    public CommonResponseDTO refreshToken(HttpServletResponse response,
                                           @RequestParam("refresh_token") String refreshToken) throws IOException {
 //        String username = WebUtil.getCookieValue(request, authContext.getUsernameCookieName());
         Token token = tokenProvider.newTokenFromRefreshToken(refreshToken);

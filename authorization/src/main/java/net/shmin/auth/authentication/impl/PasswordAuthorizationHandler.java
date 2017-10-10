@@ -3,7 +3,6 @@ package net.shmin.auth.authentication.impl;
 import net.shmin.auth.event.LoginFailureEvent;
 import net.shmin.auth.event.LoginSuccessEvent;
 import net.shmin.auth.token.Token;
-import net.shmin.auth.token.TokenType;
 import net.shmin.auth.util.WebUtil;
 import net.shmin.core.dto.CommonResponseDTO;
 import org.springframework.stereotype.Component;

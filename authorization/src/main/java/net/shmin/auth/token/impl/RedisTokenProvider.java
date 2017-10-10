@@ -12,10 +12,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
-import java.io.UnsupportedEncodingException;
-
-import static net.shmin.core.Constant.CHARSET_UTF8;
-
 
 /**
  * Created by benjamin on 2016/12/13.

@@ -53,6 +53,12 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
 
     public static final String USER_REQUEST_PARAM_NAME_REG = "${request.authorize.param.username}";
 
+    public static final String REQUEST_AUTHORIZE_PATH_REG = "${request.authorize.path}";
+
+    public static final String REQUEST_LOGOUT_PATH_REG = "${request.logout.path}";
+
+    public static final String REQUEST_REFRESH_TOKEN_PATH_REG = "${request.refresh.token.path}";
+
     public static final String DEFAULT_TOKEN_PROVIDER_BEAN_NAME = "redisTokenProvider";
 
 
@@ -96,6 +102,15 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
     private String usernameRequestParam = "username";
 
     private IAuthTokenProvider authTokenProvider;
+
+    @Value(REQUEST_AUTHORIZE_PATH_REG)
+    private String authorizePath;
+
+    @Value(REQUEST_LOGOUT_PATH_REG)
+    private String logoutPath;
+
+    @Value(REQUEST_REFRESH_TOKEN_PATH_REG)
+    private String refreshTokenPath;
 
     @PostConstruct
     private void init(){
@@ -201,6 +216,18 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
 
         if (usernameRequestParam == null || usernameRequestParam.isEmpty() || USER_REQUEST_PARAM_NAME_REG.equals(usernameRequestParam)){
             usernameRequestParam = "username";
+        }
+
+        if (authorizePath == null || authorizePath.isEmpty() || REQUEST_AUTHORIZE_PATH_REG.equals(authorizePath)){
+            authorizePath = "/authorize";
+        }
+
+        if (logoutPath == null || logoutPath.isEmpty() || REQUEST_LOGOUT_PATH_REG.equals(logoutPath)){
+            logoutPath = "/revoke_token";
+        }
+
+        if (refreshTokenPath == null || refreshTokenPath.isEmpty() || REQUEST_REFRESH_TOKEN_PATH_REG.equals(refreshTokenPath)){
+            usernameRequestParam = "/refresh_token";
         }
 
     }
@@ -323,6 +350,30 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
 
     public void setAuthTokenProvider(IAuthTokenProvider authTokenProvider) {
         this.authTokenProvider = authTokenProvider;
+    }
+
+    public String getAuthorizePath() {
+        return authorizePath;
+    }
+
+    public void setAuthorizePath(String authorizePath) {
+        this.authorizePath = authorizePath;
+    }
+
+    public String getLogoutPath() {
+        return logoutPath;
+    }
+
+    public void setLogoutPath(String logoutPath) {
+        this.logoutPath = logoutPath;
+    }
+
+    public String getRefreshTokenPath() {
+        return refreshTokenPath;
+    }
+
+    public void setRefreshTokenPath(String refreshTokenPath) {
+        this.refreshTokenPath = refreshTokenPath;
     }
 
     @Override

@@ -6,14 +6,10 @@ import net.shmin.auth.token.IAuthTokenGenerator;
 import net.shmin.auth.token.IAuthTokenProvider;
 import net.shmin.auth.token.Token;
 import net.shmin.auth.token.TokenType;
-import net.shmin.core.util.SerializationUtil;
-import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.UnsupportedEncodingException;
 
 /**
  * Created by benjamin on 2017/3/29.

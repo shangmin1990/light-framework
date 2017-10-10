@@ -3,11 +3,8 @@ package net.shmin.auth.token.impl;
 import com.alibaba.fastjson.JSONObject;
 import net.shmin.auth.AuthContext;
 import net.shmin.auth.token.IAuthTokenGenerator;
-import net.shmin.auth.token.IAuthTokenProvider;
 import net.shmin.auth.token.Token;
 import net.shmin.auth.token.TokenType;
-import net.shmin.core.util.SerializationUtil;
-import org.apache.commons.codec.binary.Base64;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,9 +12,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * Created by benjamin on 2017/3/28.
