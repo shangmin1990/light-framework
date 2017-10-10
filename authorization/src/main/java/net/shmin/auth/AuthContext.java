@@ -4,6 +4,8 @@ import net.shmin.auth.authentication.PasswordValidator;
 import net.shmin.auth.token.IAuthTokenProvider;
 import net.shmin.auth.util.WebUtil;
 import net.shmin.core.util.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -22,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Component
 public class AuthContext implements ApplicationContextAware, EmbeddedValueResolverAware {
+
+    private static Logger logger = LoggerFactory.getLogger(AuthContext.class);
 
     public static final String PASSWORD_VALIDATOR_BEAN_NAME_REG = "${password-validator.beanName}";
 
@@ -118,6 +122,8 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
         String passwordValidatorBeanName = stringValueResolver.resolveStringValue(PASSWORD_VALIDATOR_BEAN_NAME_REG);
         passwordValidator = applicationContext.getBean(passwordValidatorBeanName, PasswordValidator.class);
 
+        logger.info("passwordValidatorBeanName:{}, className:{}", passwordValidatorBeanName, passwordValidator.getClass().getName());
+
         // AUTH TOKEN PROVIDER
         String authTokenProviderBeanName = stringValueResolver.resolveStringValue(TOKEN_PROVIDER_BEAN_NAME_REG);
 
@@ -128,6 +134,8 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
         }
 
         authTokenProvider = applicationContext.getBean(authTokenProviderBeanName, IAuthTokenProvider.class);
+
+        logger.info("authTokenProviderBeanName:{}, className:{}", authTokenProviderBeanName, authTokenProvider.getClass().getName());
 
         // 默认七天
         String access_token_expires = stringValueResolver.resolveStringValue(ACCESS_TOKEN_EXPIRES_REG);
@@ -140,6 +148,8 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
 
         accessTokenExpire = DateUtils.resolveMillionSeconds(access_token_expires);
 
+        logger.info("access_token有效期:{}",accessTokenExpire);
+
         String authorization_code_expires = stringValueResolver.resolveStringValue(AUTH_CODE_EXPIRES_REG);
 
         if (authorization_code_expires == null
@@ -150,6 +160,8 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
 
         authorizationCodeExpires = DateUtils.resolveMillionSeconds(authorization_code_expires);
 
+        logger.info("authorization code有效期:{}",authorizationCodeExpires);
+
         String refresh_token_expires = stringValueResolver.resolveStringValue(REFRESH_TOKEN_EXPIRES_REG);
 
         if (refresh_token_expires == null
@@ -159,6 +171,8 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
         }
 
         refreshTokenExpires = DateUtils.resolveMillionSeconds(refresh_token_expires);
+
+        logger.info("refresh token有效期:{}",refreshTokenExpires);
 
         String accessTokenRedisDatabaseStr = stringValueResolver.resolveStringValue(ACCESS_TOKEN_REDIS_DATABASE_REG);
 
@@ -186,49 +200,75 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
 
         authorizationCodeRedisDatabase = Integer.parseInt(authorizationCodeRedisDatabaseStr);
 
+        logger.info("authorization code redis库:{}",authorizationCodeRedisDatabase);
+
         accessTokenRedisDatabase = Integer.parseInt(accessTokenRedisDatabaseStr);
 
+        logger.info("access token redis库:{}",accessTokenRedisDatabase);
+
         refreshTokenRedisDatabase = Integer.parseInt(refreshTokenRedisDatabaseStr);
+
+        logger.info("refresh token redis库:{}",refreshTokenRedisDatabase);
 
         if (tokenKeyPrefix == null || tokenKeyPrefix.isEmpty() || TOKEN_PREFIX_REG.equals(tokenKeyPrefix)){
             tokenKeyPrefix = "";
         }
 
+        logger.info("token prefix:{}", tokenKeyPrefix);
+
         if (accessTokenKeySuffix == null || accessTokenKeySuffix.isEmpty() || ACCESS_TOKEN_SUFFIX_REG.equals(accessTokenKeySuffix)){
             accessTokenKeySuffix = "_ACCESS_TOKEN";
         }
+
+        logger.info("access token suffix:{}", accessTokenKeySuffix);
 
         if (authorizationCodeKeySuffix == null || authorizationCodeKeySuffix.isEmpty() || AUTHORIZATION_CODE_SUFFIX_REG.equals(authorizationCodeKeySuffix)){
             authorizationCodeKeySuffix = "_AUTHORIZATION_CODE";
         }
 
+        logger.info("authorization code suffix:{}", authorizationCodeKeySuffix);
+
         if (refreshTokenKeySuffix == null || refreshTokenKeySuffix.isEmpty() || REFRESH_TOKEN_SUFFIX_REG.equals(refreshTokenKeySuffix)){
             refreshTokenKeySuffix = "_REFRESH_TOKEN";
         }
+
+        logger.info("refresh token suffix:{}", refreshTokenKeySuffix);
 
         if (accessTokenCookieName == null || accessTokenCookieName.isEmpty() || ACCESS_TOKEN_COOKIE_NAME_REG.equals(accessTokenCookieName)){
             accessTokenCookieName = "access_token";
         }
 
+        logger.info("access token cookie name:{}", accessTokenCookieName);
+
         if (usernameCookieName == null || usernameCookieName.isEmpty() || USER_COOKIE_NAME_REG.equals(usernameCookieName)){
             usernameCookieName = "username";
         }
+
+        logger.info("username cookie name:{}", usernameCookieName);
 
         if (usernameRequestParam == null || usernameRequestParam.isEmpty() || USER_REQUEST_PARAM_NAME_REG.equals(usernameRequestParam)){
             usernameRequestParam = "username";
         }
 
+        logger.info("username request param name:{}", usernameRequestParam);
+
         if (authorizePath == null || authorizePath.isEmpty() || REQUEST_AUTHORIZE_PATH_REG.equals(authorizePath)){
             authorizePath = "/authorize";
         }
+
+        logger.info("登录接口请求路径:{}", authorizePath);
 
         if (logoutPath == null || logoutPath.isEmpty() || REQUEST_LOGOUT_PATH_REG.equals(logoutPath)){
             logoutPath = "/revoke_token";
         }
 
+        logger.info("注销登录接口请求路径:{}", logoutPath);
+
         if (refreshTokenPath == null || refreshTokenPath.isEmpty() || REQUEST_REFRESH_TOKEN_PATH_REG.equals(refreshTokenPath)){
-            usernameRequestParam = "/refresh_token";
+            refreshTokenPath = "/refresh_token";
         }
+
+        logger.info("刷新令牌请求路径:{}", refreshTokenPath);
 
     }
 

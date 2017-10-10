@@ -26,9 +26,9 @@ public class SimpAuthTokenGenerator implements IAuthTokenGenerator {
 
     @PostConstruct
     public void init() {
-        logger.info("access_token有效期为{}分钟", authContext.getAccessTokenExpire() / 60000);
-        logger.info("refresh_token有效期为{}分钟", authContext.getRefreshTokenExpires() / 60000);
-        logger.info("authorization_code有效期为{}分钟", authContext.getAuthorizationCodeExpires() / 60000);
+//        logger.info("access_token有效期为{}分钟", authContext.getAccessTokenExpire() / 60000);
+//        logger.info("refresh_token有效期为{}分钟", authContext.getRefreshTokenExpires() / 60000);
+//        logger.info("authorization_code有效期为{}分钟", authContext.getAuthorizationCodeExpires() / 60000);
     }
 
     @Override
@@ -38,6 +38,7 @@ public class SimpAuthTokenGenerator implements IAuthTokenGenerator {
             token.setExpires( authContext.getAuthorizationCodeExpires());
             token.setTokenType(TokenType.authorizationCode);
         }
+        logger.info("生成鉴权码:{}", token);
         return token;
     }
 
@@ -50,6 +51,7 @@ public class SimpAuthTokenGenerator implements IAuthTokenGenerator {
             Token refreshToken = generateRefreshToken();
             token.setRefreshToken(refreshToken);
         }
+        logger.info("生成访问令牌:{}", token);
         return token;
     }
 

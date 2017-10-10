@@ -3,6 +3,7 @@ package net.shmin.common.advice;
 import net.shmin.core.Constant;
 import net.shmin.core.dto.CommonResponseDTO;
 import net.shmin.core.exception.BusinessServiceException;
+import net.shmin.core.util.LoggerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.WebDataBinder;
@@ -34,12 +35,7 @@ public class ControllerAspect implements Constant {
     @ExceptionHandler
     public void handleException(HttpServletRequest request, HttpServletResponse response, Exception e) {
         e.printStackTrace();
-        StackTraceElement[] elements = e.getStackTrace();
-        if(elements != null && elements.length > 0){
-            for (int i = 0; i < elements.length; i++){
-                logger.error("at {}({}:{})", elements[i].getMethodName(), elements[i].getFileName(), elements[i].getLineNumber());
-            }
-        }
+        LoggerUtil.throwableLog(logger, e);
         responseErrorForAjax(response, e);
     }
 

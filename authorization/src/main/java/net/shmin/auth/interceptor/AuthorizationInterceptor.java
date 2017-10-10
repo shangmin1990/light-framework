@@ -7,6 +7,8 @@ import net.shmin.auth.token.Token;
 import net.shmin.auth.token.TokenType;
 import net.shmin.auth.util.WebUtil;
 import net.shmin.core.Constant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -21,6 +23,8 @@ import javax.servlet.http.HttpServletResponse;
  * 2.如果请求有参数,验证Verify-Code的值,保证请求不会被篡改.
  */
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
+
+    private static Logger logger = LoggerFactory.getLogger(AuthorizationInterceptor.class);
 
     @Autowired
     private AuthContext authContext;
@@ -61,7 +65,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         }
 
         tokenProvider = authContext.getAuthTokenProvider();
-
+        logger.info("tokenProvider:{}", tokenProvider);
         //servletContext.getContextPath();
     }
 
@@ -80,8 +84,10 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
                 || username.isEmpty()
                 || !tokenProvider.checkToken(cookieTokenValue, TokenType.accessToken)) {
             if (WebUtil.isAjaxRequest(request)) {
+                logger.info("not login and request use ajax, send response ");
                 WebUtil.reply(request, response, 401, "请先登录");
             } else {
+                logger.info("not login, redirect to url:{}", loginUrl);
                 response.sendRedirect(loginUrl);
             }
         } else {

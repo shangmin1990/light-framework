@@ -7,6 +7,9 @@ import net.shmin.auth.token.Token;
 import net.shmin.auth.token.TokenType;
 import net.shmin.auth.util.WebUtil;
 import net.shmin.core.dto.CommonResponseDTO;
+import net.shmin.core.util.LoggerUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +35,8 @@ import java.util.List;
 public class AuthorizationCtrl {
 
     private List<AuthorizationHandler> authorizationHandlers = new ArrayList<AuthorizationHandler>();
+
+    private Logger logger = LoggerFactory.getLogger(AuthorizationCtrl.class);
 
     @Resource(name = "redisTokenProvider")
     private IAuthTokenProvider tokenProvider;
@@ -69,11 +74,13 @@ public class AuthorizationCtrl {
 //            @ApiImplicitParam(name = "grant_type", dataType = "string", value = "用户名", defaultValue = "password", allowableValues = "password", paramType = "form")
 //    })
     public void authorize(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        logger.info("接收到登录请求");
         try {
             for (AuthorizationHandler authorizationHandler : authorizationHandlers) {
                 authorizationHandler.handleAuthorization(request, response);
             }
         } catch (Exception e) {
+            LoggerUtil.throwableLog(logger, e);
             response.setStatus(500);
             response.setCharacterEncoding(request.getCharacterEncoding());
             PrintWriter out = response.getWriter();
