@@ -5,7 +5,7 @@
 <dependency>
     <groupId>net.shmin</groupId>
     <artifactId>authorization</artifactId>
-    <version>2.2.0-RELEASE</version>
+    <version>2.2.3-RELEASE</version>
 </dependency>
 ```
 ## 实现PasswordValidator
@@ -182,6 +182,14 @@ request.authorize.param.username = username
 # 自定义token.provider beanName 
 # 默认的tokenProviderBeanName 是 redisTokenProviderImpl
 token.provider.beanName = myTokenProvider
+
+## 配置相关request路径 (必须配置)
+# 登录
+request.authorize.path = /authorize
+# 登出
+request.logout.path = /logout
+# 通过refreshToken获取新的token
+request.refresh.token.path = /refresh
 ```
 
 ## [Demo案例(light-framework-project)](https://github.com/shangmin1990/light-framework-project)

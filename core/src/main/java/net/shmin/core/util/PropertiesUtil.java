@@ -37,6 +37,7 @@ public class PropertiesUtil {
         return cl;
     }
 
+    @Deprecated
     public static void initDefault() {
         InputStream in = PropertiesUtil.getDefaultClassLoader().getResourceAsStream("oauth.properties");
         try {

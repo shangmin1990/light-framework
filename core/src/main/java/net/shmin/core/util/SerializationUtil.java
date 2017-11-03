@@ -19,12 +19,13 @@ public class SerializationUtil {
 
     }
 
-    private static Kryo kryo = new Kryo();
+//    private static Kryo kryo = new Kryo();
 
     public static byte[] serializeByKryo(Object o){
         Assert.notNull(o);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         Output output = new Output(byteArrayOutputStream);
+        Kryo kryo = new Kryo();
         kryo.writeObject(output, o);
         byte[] result = output.getBuffer();
         output.close();
@@ -37,6 +38,7 @@ public class SerializationUtil {
         Assert.isTrue(bytes.length > 0);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
         Input input = new Input(byteArrayInputStream);
+        Kryo kryo = new Kryo();
         T t = kryo.readObject(input, clazz);
         input.close();
         return t;
