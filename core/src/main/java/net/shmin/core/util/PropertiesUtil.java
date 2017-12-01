@@ -37,6 +37,14 @@ public class PropertiesUtil {
         return cl;
     }
 
+    public static Properties load(String path) throws IOException {
+        InputStream in = PropertiesUtil.getDefaultClassLoader().getResourceAsStream(path);
+        Properties properties = new Properties();
+        properties.load(in);
+        in.close();
+        return properties;
+    }
+
     @Deprecated
     public static void initDefault() {
         InputStream in = PropertiesUtil.getDefaultClassLoader().getResourceAsStream("oauth.properties");

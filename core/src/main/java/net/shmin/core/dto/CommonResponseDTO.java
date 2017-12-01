@@ -67,28 +67,28 @@ public class CommonResponseDTO implements Serializable {
 
     static class Error {
 
-        private int error_code;
+        private int code;
 
 //        private Throwable throwable;
 
-        private String errorMsg;
+        private String message;
 
         private Error(int code){
-            error_code = code;
+            this.code = code;
         }
 
         private Error(int code, String message){
-            error_code = code;
+            this.code = code;
 //            throwable = cause;
-            this.errorMsg = message;
+            this.message = message;
         }
 
-        public int getError_code() {
-            return error_code;
+        public int getCode() {
+            return code;
         }
 
-        public void setError_code(int error_code) {
-            this.error_code = error_code;
+        public void setCode(int errorCode) {
+            this.code = errorCode;
         }
 
 //        public Throwable getThrowable() {
@@ -99,12 +99,12 @@ public class CommonResponseDTO implements Serializable {
 //            this.throwable = throwable;
 //        }
 
-        public String getErrorMsg() {
-            return errorMsg;
+        public String getMessage() {
+            return message;
         }
 
-        public void setErrorMsg(String errorMsg) {
-            this.errorMsg = errorMsg;
+        public void setMessage(String errorMsg) {
+            this.message = errorMsg;
         }
     }
 }

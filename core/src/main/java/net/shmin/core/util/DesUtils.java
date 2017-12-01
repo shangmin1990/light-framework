@@ -28,9 +28,9 @@ public class DesUtils {
      * @param data 待进行DES加密的数据
      * @return 返回经过DES加密后的数据
      */
-    public final static String decrypt(String data) throws Exception {
+    public final static String decrypt(String data, String key) throws Exception {
         return new String(decrypt(hex2byte(data.getBytes()),
-                PASSWORD_CRYPT_KEY.getBytes()));
+                key.getBytes()));
     }
 
     /**
@@ -39,8 +39,8 @@ public class DesUtils {
      * @param data DES加密数据
      * @return 返回解密后的数据
      */
-    public final static String encrypt(String data) throws Exception {
-        return byte2hex(encrypt(data.getBytes(), PASSWORD_CRYPT_KEY
+    public final static String encrypt(String data, String key) throws Exception {
+        return byte2hex(encrypt(data.getBytes(), key
                 .getBytes()));
     }
 
@@ -121,9 +121,9 @@ public class DesUtils {
 
     public static void main(String[] args) throws Exception {
         String md5Password = "tianbaoyou";
-        String str = DesUtils.encrypt(md5Password);
+        String str = DesUtils.encrypt(md5Password, "abcdefghi");
         System.out.println("密文: " + str);
-        str = DesUtils.decrypt(str);
+        str = DesUtils.decrypt(str, "abcdefghi");
         System.out.println("明文: " + str);
     }
 
