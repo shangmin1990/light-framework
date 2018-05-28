@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 多线程方法中使用了共享变量SimpleDateFormat，报如下错误：
@@ -18,7 +20,7 @@ import java.util.Date;
  */
 public class DateUtils {
 
-    private static ThreadLocal<SimpleDateFormat> threadLocal = new ThreadLocal<SimpleDateFormat>();
+    private static ThreadLocal<Map<String, SimpleDateFormat>> threadLocal = new ThreadLocal<>();
 
     public final static String DEFAULT_PATTERN = "yyyy/MM/dd HH:mm:ss";
 
@@ -53,13 +55,21 @@ public class DateUtils {
     }
 
     public static String format(Date date, String pattern) {
-        if (date == null) return "";
-        SimpleDateFormat simpleDateFormat = threadLocal.get();
-        if(simpleDateFormat == null){
-            simpleDateFormat = new SimpleDateFormat(pattern);
-            threadLocal.set(simpleDateFormat);
-        }
+        SimpleDateFormat simpleDateFormat = getSDF(pattern);
         return simpleDateFormat.format(date);
+    }
+
+    private static SimpleDateFormat getSDF(String pattern) {
+        Map<String, SimpleDateFormat> simpleDateFormatMap = threadLocal.get();
+        if (simpleDateFormatMap == null){
+            simpleDateFormatMap = new HashMap<String, SimpleDateFormat>();
+            threadLocal.set(simpleDateFormatMap);
+        }
+        if(simpleDateFormatMap.get(pattern) == null){
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+            simpleDateFormatMap.put(pattern, simpleDateFormat);
+        }
+        return simpleDateFormatMap.get(pattern);
     }
 
     public static Date parse(String date) throws ParseException {
@@ -67,11 +77,7 @@ public class DateUtils {
     }
 
     public static Date parse(String date, String pattern) throws ParseException {
-        SimpleDateFormat simpleDateFormat = threadLocal.get();
-        if(simpleDateFormat == null) {
-            simpleDateFormat = new SimpleDateFormat(pattern);
-            threadLocal.set(simpleDateFormat);
-        }
+        SimpleDateFormat simpleDateFormat = getSDF(pattern);
         return simpleDateFormat.parse(date);
     }
 
