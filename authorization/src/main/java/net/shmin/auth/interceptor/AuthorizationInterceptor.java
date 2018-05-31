@@ -72,7 +72,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String cookieTokenValue = WebUtil.getCookieValue(request, Constant.ACCESS_TOKEN);
-        String username = WebUtil.getCookieValue(request, Constant.USERNAME);
+//        String username = WebUtil.getCookieValue(request, Constant.USERNAME);
         Token token = new Token();
         token.setTokenType(TokenType.accessToken);
         token.setValue(cookieTokenValue);
@@ -80,8 +80,8 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         // 不用refresh Token了 直接跳转到登录页
         if (cookieTokenValue == null
                 || cookieTokenValue.isEmpty()
-                || username == null
-                || username.isEmpty()
+//                || username == null
+//                || username.isEmpty()
                 || !tokenProvider.checkToken(cookieTokenValue, TokenType.accessToken)) {
             if (WebUtil.isAjaxRequest(request)) {
                 logger.info("not login and request use ajax, send response ");

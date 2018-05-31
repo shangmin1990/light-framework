@@ -3,7 +3,6 @@ package net.shmin.auth.authentication.impl;
 import net.shmin.auth.AuthContext;
 import net.shmin.auth.authentication.AuthorizationHandler;
 import net.shmin.auth.authentication.PasswordValidator;
-import net.shmin.auth.authentication.exception.NoGrantTypeFoundException;
 import net.shmin.auth.event.LoginListenerManager;
 import net.shmin.auth.token.GrantType;
 import net.shmin.auth.token.IAuthTokenGenerator;
@@ -11,6 +10,8 @@ import net.shmin.auth.token.IAuthTokenProvider;
 import net.shmin.auth.token.Token;
 import net.shmin.core.Constant;
 import net.shmin.core.dto.CommonResponseDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -42,6 +43,8 @@ public abstract class AbstractAuthorizationHandler implements AuthorizationHandl
     protected LoginListenerManager loginListenerManager;
 
     protected String requestParamUsername;
+
+    private static Logger logger = LoggerFactory.getLogger(AbstractAuthorizationHandler.class);
 
     public PasswordValidator getPasswordValidator() {
         return passwordValidator;
@@ -104,10 +107,20 @@ public abstract class AbstractAuthorizationHandler implements AuthorizationHandl
     @Override
     public void handleAuthorization(ServletRequest request, ServletResponse response) throws Exception {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        /**
+         * 防止请求被处理多次
+         */
+        if (REQUEST_AUTH_HANDLE.equals(request.getAttribute(REQUEST_AUTH_HANDLE))){
+            logger.info("当前请求已经被处理过!!!");
+            return;
+        }
+
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         String grant_type = request.getParameter(GRANT_TYPE);
-
-        assert grant_type != null;
+        if (grant_type == null){
+            handleNoneGrantType(httpServletRequest, httpServletResponse);
+            return;
+        }
         if (GrantType.PASSWORD.getName().equals(grant_type)) {
             handlePasswordGrantType(httpServletRequest, httpServletResponse);
         } else if (GrantType.AUTHORIZATION_CODE.getName().equals(grant_type)) {
@@ -120,14 +133,24 @@ public abstract class AbstractAuthorizationHandler implements AuthorizationHandl
 //      handleClientGrantType(httpServletRequest, httpServletResponse);
 //    }
         else {
-            throw new NoGrantTypeFoundException(10001, "Grant_type " + grant_type + " not support");
+            handleNoneGrantType(httpServletRequest, httpServletResponse);
         }
 
+        request.setAttribute(REQUEST_AUTH_HANDLE, REQUEST_AUTH_HANDLE);
     }
+
+
 
     CommonResponseDTO login(HttpServletRequest request) throws Exception {
         return passwordValidator.login(request);
     }
+
+    /**
+     * 普通登录验证
+     * @param httpServletRequest
+     * @param httpServletResponse
+     */
+    protected abstract void handleNoneGrantType(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception ;
 
     /**
      * 用户名,密码模式验证.
@@ -164,7 +187,7 @@ public abstract class AbstractAuthorizationHandler implements AuthorizationHandl
      */
     public abstract void handleClientGrantType(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
-    protected void setLoginSuccessCookies(HttpServletRequest request, HttpServletResponse response, Token token, String username){
+    protected void setLoginSuccessCookies(HttpServletRequest request, HttpServletResponse response, Token token){
         String path = request.getServletContext().getContextPath();
         // access_token cookie
         Cookie access_token_cookie = new Cookie(access_token_cookie_name, token.getValue());
@@ -172,14 +195,8 @@ public abstract class AbstractAuthorizationHandler implements AuthorizationHandl
         access_token_cookie.setHttpOnly(true);
         access_token_cookie.setVersion(1);
         access_token_cookie.setMaxAge((int) (token.getExpires() / 1000));
-        // username cookie
-        Cookie username_cookie = new Cookie(username_cookie_name, username);
-        username_cookie.setPath(path);
-        username_cookie.setHttpOnly(true);
-        username_cookie.setVersion(1);
-        username_cookie.setMaxAge((int) (token.getExpires() / 1000));
 
         response.addCookie(access_token_cookie);
-        response.addCookie(username_cookie);
+//        response.addCookie(username_cookie);
     }
 }

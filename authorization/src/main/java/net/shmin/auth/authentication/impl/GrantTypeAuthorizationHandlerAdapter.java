@@ -11,6 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 public class GrantTypeAuthorizationHandlerAdapter extends AbstractAuthorizationHandler {
 
     @Override
+    protected void handleNoneGrantType(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
+
+    }
+
+    @Override
     public void handlePasswordGrantType(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
     }

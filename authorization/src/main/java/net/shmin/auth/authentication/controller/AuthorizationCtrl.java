@@ -2,6 +2,7 @@ package net.shmin.auth.authentication.controller;
 
 import net.shmin.auth.AuthContext;
 import net.shmin.auth.authentication.AuthorizationHandler;
+import net.shmin.auth.authentication.AuthorizationHandlerFactory;
 import net.shmin.auth.token.IAuthTokenProvider;
 import net.shmin.auth.token.Token;
 import net.shmin.auth.token.TokenType;
@@ -24,8 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 登录权限相关的ctrl
@@ -34,26 +33,20 @@ import java.util.List;
 @Controller
 public class AuthorizationCtrl {
 
-    private List<AuthorizationHandler> authorizationHandlers = new ArrayList<AuthorizationHandler>();
+    @Autowired
+    private AuthorizationHandlerFactory factory;
 
     private Logger logger = LoggerFactory.getLogger(AuthorizationCtrl.class);
 
     @Resource(name = "redisTokenProvider")
     private IAuthTokenProvider tokenProvider;
 
-    @Resource(name = "passwordAuthHandler")
-    private AuthorizationHandler password;
-
-    @Resource(name = "authorizationCodeHandler")
-    private AuthorizationHandler authorizationCode;
-
     @Autowired
     private AuthContext authContext;
 
     @PostConstruct
     public void init() {
-        authorizationHandlers.add(password);
-//        authorizationHandlers.add(authorizationCode);
+
     }
 
     public IAuthTokenProvider getTokenProvider() {
@@ -74,9 +67,9 @@ public class AuthorizationCtrl {
 //            @ApiImplicitParam(name = "grant_type", dataType = "string", value = "用户名", defaultValue = "password", allowableValues = "password", paramType = "form")
 //    })
     public void authorize(HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        logger.info("接收到登录请求");
         try {
-            for (AuthorizationHandler authorizationHandler : authorizationHandlers) {
+            AuthorizationHandler authorizationHandler = factory.getAuthorizationHandler(request);
+            if (authorizationHandler != null){
                 authorizationHandler.handleAuthorization(request, response);
             }
         } catch (Exception e) {
@@ -99,10 +92,6 @@ public class AuthorizationCtrl {
         Cookie cookie = new Cookie(authContext.getAccessTokenCookieName(), "");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
-
-        Cookie cookie1 = new Cookie(authContext.getUsernameCookieName(), "");
-        cookie1.setMaxAge(0);
-        response.addCookie(cookie1);
         return CommonResponseDTO.success();
     }
 
@@ -111,7 +100,6 @@ public class AuthorizationCtrl {
     @ResponseBody
     public CommonResponseDTO refreshToken(HttpServletResponse response,
                                           @RequestParam("refresh_token") String refreshToken) throws IOException {
-//        String username = WebUtil.getCookieValue(request, authContext.getUsernameCookieName());
         Token token = tokenProvider.newTokenFromRefreshToken(refreshToken);
         Cookie cookie = new Cookie(authContext.getAccessTokenCookieName(), token.getValue());
         cookie.setMaxAge(0);

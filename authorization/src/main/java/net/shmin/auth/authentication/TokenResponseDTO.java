@@ -14,11 +14,11 @@ public class TokenResponseDTO {
     // 授权用户的UID，本字段只是为了方便开发者，
     // 第三方应用不能用此字段作为用户登录状态的识别，
     // 只有access_token才是用户授权的唯一票据。
-    private String username;
+//    private String username;
 
     private String accessTokenCookieName;
 
-    private String usernameCookieName;
+//    private String usernameCookieName;
 
     private Object data;
 
@@ -41,13 +41,13 @@ public class TokenResponseDTO {
         this.expires_in = expires_in;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
+//    public String getUsername() {
+//        return username;
+//    }
+//
+//    public void setUsername(String username) {
+//        this.username = username;
+//    }
 
     public String getAccessTokenCookieName() {
         return accessTokenCookieName;
@@ -57,13 +57,13 @@ public class TokenResponseDTO {
         this.accessTokenCookieName = accessTokenCookieName;
     }
 
-    public String getUsernameCookieName() {
-        return usernameCookieName;
-    }
-
-    public void setUsernameCookieName(String usernameCookieName) {
-        this.usernameCookieName = usernameCookieName;
-    }
+//    public String getUsernameCookieName() {
+//        return usernameCookieName;
+//    }
+//
+//    public void setUsernameCookieName(String usernameCookieName) {
+//        this.usernameCookieName = usernameCookieName;
+//    }
 
     public Object getData() {
         return data;

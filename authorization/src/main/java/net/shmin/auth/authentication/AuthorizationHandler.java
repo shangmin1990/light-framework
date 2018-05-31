@@ -8,6 +8,8 @@ import javax.servlet.ServletResponse;
  */
 public interface AuthorizationHandler {
 
+    String REQUEST_AUTH_HANDLE = "net.shmin.auth.authentication.Request-Auth-Handle";
+
     /**
      * OAuth2.0授权接口
      * 当用户将要授权的时候,调用此方法

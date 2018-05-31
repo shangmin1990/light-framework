@@ -1,13 +1,10 @@
 package net.shmin.auth.util;
 
-import com.alibaba.fastjson.JSON;
 import net.shmin.auth.authentication.TokenResponseDTO;
 import net.shmin.auth.token.Token;
 import net.shmin.core.Constant;
 import net.shmin.core.dto.CommonResponseDTO;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,10 +24,6 @@ public class WebUtil implements Constant {
 
     private WebUtil() {
 
-    }
-
-    public static void replyNoAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        replyNoAccess(request, response, DEFAULT_NO_ACCESS);
     }
 
     public static void reply(HttpServletRequest request, HttpServletResponse response, int code, String responseText) throws IOException {
@@ -60,38 +53,12 @@ public class WebUtil implements Constant {
         return null;
     }
 
-    public static void responseToken(ServletRequest request, ServletResponse servletResponse, Token token) {
-//    HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
-        //String encoding = httpServletRequest.getCharacterEncoding();
-        httpServletResponse.setContentType("application/json;charset=UTF-8");
-        httpServletResponse.setHeader("Cache-Control", "no-store");
-        httpServletResponse.setHeader("Pragma", "no-cache");
-        httpServletResponse.setCharacterEncoding(CHARSET_UTF8);
-        PrintWriter out = null;
-        try {
-            out = httpServletResponse.getWriter();
-            TokenResponseDTO tokenResponseDTO = new TokenResponseDTO();
-            tokenResponseDTO.setAccess_token(token.getValue());
-            tokenResponseDTO.setExpires_in(token.getExpires());
-            String result = JSON.toJSONString(tokenResponseDTO);
-            out.println(result);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (out != null) {
-                out.flush();
-                out.close();
-            }
-        }
-    }
-
     public static boolean isAjaxRequest(HttpServletRequest request) {
         String requestType = request.getHeader(AJAX_HEADER);
         return requestType != null && requestType.toLowerCase().equals(XMLHTTPREQUEST);
     }
 
-    public static void response(HttpServletRequest request, HttpServletResponse httpServletResponse, Token token, String access_token_name, String username_cookie_name, Object user) {
+    public static void response(HttpServletRequest request, HttpServletResponse httpServletResponse, Token token, String access_token_name, Object obj) {
 //        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         //String encoding = httpServletRequest.getCharacterEncoding();
         httpServletResponse.setContentType("application/json;charset=UTF-8");
@@ -105,8 +72,8 @@ public class WebUtil implements Constant {
             tokenResponseDTO.setAccess_token(token.getValue());
             tokenResponseDTO.setExpires_in(token.getExpires());
             tokenResponseDTO.setAccessTokenCookieName(access_token_name);
-            tokenResponseDTO.setUsernameCookieName(username_cookie_name);
-            tokenResponseDTO.setData(user);
+//            tokenResponseDTO.setUsernameCookieName(username_cookie_name);
+            tokenResponseDTO.setData(obj);
             CommonResponseDTO common = CommonResponseDTO.success(tokenResponseDTO);
             out.println(common.toString());
         } catch (IOException e) {
