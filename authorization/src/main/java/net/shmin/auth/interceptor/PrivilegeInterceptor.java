@@ -1,11 +1,14 @@
 package net.shmin.auth.interceptor;
 
+import com.alibaba.fastjson.JSONObject;
 import net.shmin.auth.AuthContext;
+import net.shmin.auth.AuthErrorCode;
 import net.shmin.auth.permission.IPermissionValidator;
 import net.shmin.auth.permission.Privilege;
 import net.shmin.auth.permission.model.ACLEnum;
 import net.shmin.auth.util.WebUtil;
 import net.shmin.core.bean.BeanCreateFactory;
+import net.shmin.core.dto.CommonResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -17,7 +20,7 @@ import java.util.Arrays;
 /**
  * Created by benjamin on 2017/1/4.
  */
-public class PrivilegeInterceptor extends HandlerInterceptorAdapter {
+public class PrivilegeInterceptor extends HandlerInterceptorAdapter implements AuthErrorCode {
 
     @Autowired
     private AuthContext authContext;
@@ -38,8 +41,10 @@ public class PrivilegeInterceptor extends HandlerInterceptorAdapter {
             IPermissionValidator permissionManager = BeanCreateFactory.getBean(clazz, true);
 
             boolean result = permissionManager.hasPermission(username, resourceIds, needed);
+
             if (!result) {
-                WebUtil.replyNoAccess(request, response, username + "没有访问" + Arrays.toString(resourceIds) + "资源的权限");
+                CommonResponseDTO commonResponseDTO = CommonResponseDTO.error(PRIVILEGE_ERROR, username + "没有访问" + Arrays.toString(resourceIds) + "资源的权限");
+                WebUtil.reply(request, response, 200, JSONObject.toJSONString(commonResponseDTO));
             }
             return result;
         }

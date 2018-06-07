@@ -7,7 +7,7 @@ public enum GrantType {
     // 用户名密码授权模式
     PASSWORD("password"),
     // 授权码授权模式
-    AUTHORIZATION_CODE("code"),
+    AUTHORIZATION_CODE("authorization_code"),
     // 隐式授权
     IMPLICIT("implicit"),
     // 客户端授权模式

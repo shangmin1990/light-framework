@@ -1,12 +1,15 @@
 package net.shmin.auth.interceptor;
 
+import com.alibaba.fastjson.JSON;
 import net.shmin.auth.AuthContext;
+import net.shmin.auth.AuthErrorCode;
 import net.shmin.auth.handler.IRequestHandler;
 import net.shmin.auth.token.IAuthTokenProvider;
 import net.shmin.auth.token.Token;
 import net.shmin.auth.token.TokenType;
 import net.shmin.auth.util.WebUtil;
 import net.shmin.core.Constant;
+import net.shmin.core.dto.CommonResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +20,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
 /**
  * Created by benjamin on 2016/12/14.
  * 1.登录检查
  * 2.如果请求有参数,验证Verify-Code的值,保证请求不会被篡改.
  */
-public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
+public class AuthorizationInterceptor extends HandlerInterceptorAdapter implements AuthErrorCode {
 
     private static Logger logger = LoggerFactory.getLogger(AuthorizationInterceptor.class);
 
@@ -85,7 +89,8 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
                 || !tokenProvider.checkToken(cookieTokenValue, TokenType.accessToken)) {
             if (WebUtil.isAjaxRequest(request)) {
                 logger.info("not login and request use ajax, send response ");
-                WebUtil.reply(request, response, 401, "请先登录");
+                CommonResponseDTO commonResponseDTO = CommonResponseDTO.error(TOKEN_NOT_EXIST, "请先登录");
+                WebUtil.reply(request, response, 200, JSON.toJSONString(commonResponseDTO));
             } else {
                 logger.info("not login, redirect to url:{}", loginUrl);
                 response.sendRedirect(loginUrl);
@@ -100,7 +105,8 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
                         return true;
                     } else {
                         // request string 签名值不对,
-                        WebUtil.reply(request, response, 601, "请求的签名值不对");
+                        CommonResponseDTO commonResponseDTO = CommonResponseDTO.error(INVALID_SIGNATURE, "请求的签名值不对");
+                        WebUtil.reply(request, response, 200, JSON.toJSONString(commonResponseDTO));
                         return false;
                     }
                 } catch (Exception e) {

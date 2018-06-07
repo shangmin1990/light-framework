@@ -7,5 +7,9 @@ package net.shmin.auth;
  */
 public interface TokenError {
 
-    int TOKEN_NOT_EXIST = 0;
+    /**
+     * token不存在或者token错误
+     */
+    int TOKEN_NOT_EXIST = 4001;
+
 }

@@ -428,7 +428,7 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
 
     public <T> T getAttribute(String token, String attr, Class<T> tClass){
         if (token == null || token.trim().isEmpty()){
-            logger.error("token不能为空!!!");
+            logger.info("token为空!!!");
             return null;
         }
         return this.authTokenProvider.getAttribute(token, attr, tClass);
@@ -436,7 +436,7 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
 
     public void setAttribute(String token, String attr, Object value){
         if (token == null || token.trim().isEmpty()){
-            logger.error("token不能为空!!!");
+            logger.info("token为空!!!");
             return;
         }
         this.authTokenProvider.setAttribute(token, attr, value);
@@ -444,7 +444,7 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
 
     public void removeAttribute(String token, String attr){
         if (token == null || token.trim().isEmpty()){
-            logger.error("token不能为空!!!");
+            logger.info("token为空!!!");
             return;
         }
         this.authTokenProvider.removeAttribute(token, attr);
@@ -454,7 +454,7 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
     public <T> T getAttribute(HttpServletRequest request, String attr, Class<T> tClass){
         String token = WebUtil.getCookieValue(request, accessTokenCookieName);
         if (token == null || token.trim().isEmpty()){
-            logger.error("token不能为空!!!");
+            logger.info("token为空!!!");
             return null;
         }
         return this.authTokenProvider.getAttribute(token, attr, tClass);
@@ -463,7 +463,7 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
     public void setAttribute(HttpServletRequest request, String attr, Object value){
         String token = WebUtil.getCookieValue(request, accessTokenCookieName);
         if (token == null || token.trim().isEmpty()){
-            logger.error("token不能为空!!!");
+            logger.info("token为空!!!");
             return;
         }
         this.authTokenProvider.setAttribute(token, attr, value);
@@ -472,7 +472,7 @@ public class AuthContext implements ApplicationContextAware, EmbeddedValueResolv
     public void removeAttribute(HttpServletRequest request, String attr){
         String token = WebUtil.getCookieValue(request, accessTokenCookieName);
         if (token == null || token.trim().isEmpty()){
-            logger.error("token不能为空!!!");
+            logger.error("token为空!!!");
             return;
         }
         this.authTokenProvider.removeAttribute(token, attr);

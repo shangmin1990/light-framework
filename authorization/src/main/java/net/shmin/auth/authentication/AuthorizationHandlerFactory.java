@@ -30,11 +30,11 @@ public class AuthorizationHandlerFactory {
         if (grant_type == null || grant_type.trim().isEmpty()){
             return noneGrantTypeAuthHandler;
         }
-        if (grant_type.equals(GrantType.AUTHORIZATION_CODE.name())){
+        if (grant_type.equals(GrantType.AUTHORIZATION_CODE.getName())){
             return authorizationCode;
         }
 
-        if (grant_type.equals(GrantType.PASSWORD.name())){
+        if (grant_type.equals(GrantType.PASSWORD.getName())){
             return password;
         }
         return null;

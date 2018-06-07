@@ -1,6 +1,8 @@
 package net.shmin.auth.authentication.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import net.shmin.auth.AuthContext;
+import net.shmin.auth.AuthErrorCode;
 import net.shmin.auth.authentication.AuthorizationHandler;
 import net.shmin.auth.authentication.AuthorizationHandlerFactory;
 import net.shmin.auth.token.IAuthTokenProvider;
@@ -8,6 +10,7 @@ import net.shmin.auth.token.Token;
 import net.shmin.auth.token.TokenType;
 import net.shmin.auth.util.WebUtil;
 import net.shmin.core.dto.CommonResponseDTO;
+import net.shmin.core.exception.BusinessServiceException;
 import net.shmin.core.util.LoggerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +34,7 @@ import java.io.PrintWriter;
  * Created by benjamin on 2016/12/14.
  */
 @Controller
-public class AuthorizationCtrl {
+public class AuthorizationCtrl implements AuthErrorCode{
 
     @Autowired
     private AuthorizationHandlerFactory factory;
@@ -75,9 +78,16 @@ public class AuthorizationCtrl {
         } catch (Exception e) {
             LoggerUtil.throwableLog(logger, e);
             response.setStatus(500);
+            CommonResponseDTO commonResponseDTO;
+            if (e instanceof BusinessServiceException){
+                BusinessServiceException serviceException = (BusinessServiceException) e;
+                commonResponseDTO = CommonResponseDTO.error(serviceException.getCode(), serviceException.getMessage());
+            } else {
+                commonResponseDTO = CommonResponseDTO.error(SERVICE_EXCEPTION, e.getMessage());
+            }
             response.setCharacterEncoding(request.getCharacterEncoding());
             PrintWriter out = response.getWriter();
-            e.printStackTrace(out);
+            out.write(JSONObject.toJSONString(commonResponseDTO));
             out.flush();
             out.close();
         }
